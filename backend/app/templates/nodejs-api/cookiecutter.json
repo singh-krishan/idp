@@ -1,0 +1,6 @@
+{
+  "project_name": "my-api",
+  "description": "A Node.js API service",
+  "port": "3000",
+  "author": "IDP Platform"
+}

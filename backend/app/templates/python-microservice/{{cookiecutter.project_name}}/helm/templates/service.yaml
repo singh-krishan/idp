@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {% raw %}{{ include "chart.fullname" . }}{% endraw %}
+  labels:
+    app: {{ cookiecutter.project_name }}
+spec:
+  type: {% raw %}{{ .Values.service.type }}{% endraw %}
+  ports:
+  - port: {% raw %}{{ .Values.service.port }}{% endraw %}
+    targetPort: http
+    protocol: TCP
+    name: http
+  selector:
+    app: {{ cookiecutter.project_name }}

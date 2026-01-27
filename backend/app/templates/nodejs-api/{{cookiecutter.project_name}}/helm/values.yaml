@@ -1,0 +1,28 @@
+replicaCount: 1
+
+image:
+  repository: ghcr.io/GITHUB_ORG/{{ cookiecutter.project_name }}
+  pullPolicy: Always
+  tag: "latest"
+
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: {{ cookiecutter.port }}
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 250m
+    memory: 256Mi
+
+env:
+  - name: PORT
+    value: "{{ cookiecutter.port }}"
+
+podAnnotations:
+  prometheus.io/scrape: "true"
+  prometheus.io/port: "{{ cookiecutter.port }}"
+  prometheus.io/path: "/metrics"

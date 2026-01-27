@@ -1,0 +1,6 @@
+{
+  "project_name": "my-service",
+  "description": "A Python microservice",
+  "port": "8000",
+  "author": "IDP Platform"
+}

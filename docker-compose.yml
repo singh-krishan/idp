@@ -1,0 +1,52 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - DEBUG=true
+      - DATABASE_URL=sqlite:///./idp.db
+      - GITHUB_TOKEN=${GITHUB_TOKEN}
+      - GITHUB_ORG=${GITHUB_ORG}
+      - ARGOCD_URL=${ARGOCD_URL:-https://host.docker.internal:8080}
+      - ARGOCD_USERNAME=${ARGOCD_USERNAME:-admin}
+      - ARGOCD_PASSWORD=${ARGOCD_PASSWORD}
+      - ARGOCD_NAMESPACE=argocd
+      - ARGOCD_VERIFY_SSL=false
+      - KUBE_CONTEXT=kind-idp-cluster
+      - KUBE_NAMESPACE=default
+      - CONTAINER_REGISTRY=ghcr.io
+      - CORS_ORIGINS=http://localhost:5173,http://localhost:3000
+    volumes:
+      - ./backend/app:/app/app
+      - idp-db:/app
+    networks:
+      - idp-network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    ports:
+      - "5173:5173"
+    environment:
+      - VITE_API_URL=http://localhost:8000
+    volumes:
+      - ./frontend/src:/app/src
+      - ./frontend/public:/app/public
+      - ./frontend/index.html:/app/index.html
+    depends_on:
+      - backend
+    networks:
+      - idp-network
+
+networks:
+  idp-network:
+    driver: bridge
+
+volumes:
+  idp-db:
