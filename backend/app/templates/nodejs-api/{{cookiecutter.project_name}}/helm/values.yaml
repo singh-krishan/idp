@@ -1,7 +1,7 @@
 replicaCount: 1
 
 image:
-  repository: ghcr.io/GITHUB_ORG/{{ cookiecutter.project_name }}
+  repository: ghcr.io/{{ cookiecutter.github_org }}/{{ cookiecutter.project_name }}
   pullPolicy: Always
   tag: "latest"
 
@@ -9,6 +9,14 @@ service:
   type: ClusterIP
   port: 80
   targetPort: {{ cookiecutter.port }}
+
+ingress:
+  enabled: true
+  host: kris-idp.org
+  path: {{ cookiecutter.project_name }}
+  tlsSecretName: kris-idp-tls
+
+namespace: default
 
 resources:
   limits:
