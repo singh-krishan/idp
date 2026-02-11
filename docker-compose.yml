@@ -44,7 +44,7 @@ services:
       - KUBE_CONTEXT=kind-idp-cluster
       - KUBE_NAMESPACE=default
       - CONTAINER_REGISTRY=ghcr.io
-      - CORS_ORIGINS=http://localhost:5173,http://localhost:3000
+      - CORS_ORIGINS=${CORS_ORIGINS:-http://localhost:5173,http://localhost:3000,https://kris-idp.org}
     volumes:
       - ./backend/app:/app/app
       - ./backend/idp.db:/app/idp.db  # SQLite database persistence
