@@ -8,6 +8,24 @@ Internal Developer Platform (IDP) - A microservice creation and deployment autom
 
 **Purpose**: Enable developers to create production-ready microservices with full CI/CD and monitoring through a web interface.
 
+## Production Deployment
+
+**For production deployment to EC2, see [DEPLOYMENT.md](./DEPLOYMENT.md)**
+
+Quick deployment commands:
+```bash
+# Deploy both frontend and backend (with automatic database migrations)
+./deploy.sh both
+
+# Deploy backend only
+./deploy.sh backend
+
+# Deploy frontend only
+./deploy.sh frontend
+```
+
+**Production URL:** https://kris-idp.org
+
 ## Build and Development Commands
 
 ### Prerequisites Check
@@ -104,6 +122,58 @@ kubectl port-forward svc/my-service 8000:80
 
 # Delete a deployment
 kubectl delete deployment my-service
+```
+
+### Monitoring Stack Deployment
+
+Deploy Prometheus and Grafana to Kubernetes with HTTPS ingress:
+
+```bash
+cd infrastructure/kubernetes/monitoring
+
+# 1. Get EC2 private IP for backend scraping
+ssh -i ~/.ssh/idp-demo-key-new.pem ec2-user@13.42.36.97 "hostname -I | awk '{print \$1}'"
+
+# 2. Update prometheus/configmap.yaml with EC2 IP
+# Replace <EC2_PRIVATE_IP> with actual private IP
+
+# 3. Set secure Grafana password in grafana/secret.yaml
+
+# 4. Deploy monitoring stack
+bash deploy.sh
+
+# Or manually apply
+kubectl apply -f namespace.yaml
+kubectl apply -f prometheus/
+kubectl apply -f grafana/
+
+# 5. Verify deployment
+kubectl get pods -n monitoring
+kubectl get ingress -n monitoring
+
+# 6. Check TLS certificate
+kubectl get certificate -n monitoring
+```
+
+**Access URLs:**
+- Prometheus: https://my-idp.duckdns.org/prometheus
+- Grafana: https://my-idp.duckdns.org/grafana (admin / password-from-secret)
+
+**Port-forward for local testing:**
+```bash
+kubectl port-forward -n monitoring svc/prometheus 9090:9090
+kubectl port-forward -n monitoring svc/grafana 3000:3000
+```
+
+**Update monitoring after changes:**
+```bash
+# Update Prometheus config
+kubectl apply -f prometheus/configmap.yaml
+kubectl rollout restart deployment/prometheus -n monitoring
+
+# Update Grafana dashboard
+kubectl apply -f grafana/configmap-dashboard-idp.yaml
+kubectl rollout restart deployment/grafana -n monitoring
 ```
 
 ## Architecture Overview

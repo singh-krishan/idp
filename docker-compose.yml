@@ -1,6 +1,29 @@
 version: '3.8'
 
+# NOTE: PostgreSQL service is configured but NOT used in production EC2 deployment.
+# Production currently uses SQLite (idp.db) which is simpler for MVP deployment.
+# To use PostgreSQL: ensure DATABASE_URL env var is properly set in backend container.
+# SQLite database is persisted via volume mount: ./backend/idp.db:/app/idp.db
+
 services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: idp
+      POSTGRES_PASSWORD: idp_password_change_in_prod
+      POSTGRES_DB: idp_db
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - idp-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U idp"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
   backend:
     build:
       context: ./backend
@@ -9,23 +32,27 @@ services:
       - "8000:8000"
     environment:
       - DEBUG=true
-      - DATABASE_URL=sqlite:///./idp.db
+      - DATABASE_URL=postgresql://idp:idp_password_change_in_prod@postgres:5432/idp_db
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY:-your-secret-key-change-this-in-production-use-openssl-rand-hex-32}
       - GITHUB_TOKEN=${GITHUB_TOKEN}
       - GITHUB_ORG=${GITHUB_ORG}
       - ARGOCD_URL=${ARGOCD_URL:-https://host.docker.internal:8080}
       - ARGOCD_USERNAME=${ARGOCD_USERNAME:-admin}
       - ARGOCD_PASSWORD=${ARGOCD_PASSWORD}
       - ARGOCD_NAMESPACE=argocd
-      - ARGOCD_VERIFY_SSL=false
+      - ARGOCD_VERIFY_SSL=${ARGOCD_VERIFY_SSL:-true}
       - KUBE_CONTEXT=kind-idp-cluster
       - KUBE_NAMESPACE=default
       - CONTAINER_REGISTRY=ghcr.io
       - CORS_ORIGINS=http://localhost:5173,http://localhost:3000
     volumes:
       - ./backend/app:/app/app
-      - idp-db:/app
+      - ./backend/idp.db:/app/idp.db  # SQLite database persistence
     networks:
       - idp-network
+    depends_on:
+      postgres:
+        condition: service_healthy
 
   frontend:
     build:
@@ -44,9 +71,45 @@ services:
     networks:
       - idp-network
 
+  prometheus:
+    image: prom/prometheus:latest
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./infrastructure/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus-data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+    networks:
+      - idp-network
+    depends_on:
+      - backend
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./infrastructure/grafana/provisioning:/etc/grafana/provisioning
+      - ./infrastructure/grafana/dashboards:/etc/grafana/provisioning/dashboards
+    networks:
+      - idp-network
+    depends_on:
+      - prometheus
+
 networks:
   idp-network:
     driver: bridge
 
 volumes:
-  idp-db:
+  postgres-data:
+  prometheus-data:
+  grafana-data:
