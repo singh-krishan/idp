@@ -4,6 +4,10 @@ metadata:
   name: {% raw %}{{ include "chart.fullname" . }}{% endraw %}
   labels:
     app: {{ cookiecutter.project_name }}
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: {% raw %}"{{ .Values.service.port }}"{% endraw %}
+    prometheus.io/path: "/metrics"
 spec:
   type: {% raw %}{{ .Values.service.type }}{% endraw %}
   ports:

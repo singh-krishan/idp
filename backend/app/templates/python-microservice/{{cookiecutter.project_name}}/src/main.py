@@ -2,6 +2,7 @@
 {{ cookiecutter.description }}
 """
 from fastapi import FastAPI
+from prometheus_fastapi_instrumentator import Instrumentator
 import os
 
 app = FastAPI(
@@ -9,6 +10,9 @@ app = FastAPI(
     description="{{ cookiecutter.description }}",
     version="0.1.0"
 )
+
+# Initialize Prometheus instrumentation
+Instrumentator().instrument(app).expose(app)
 
 
 @app.get("/")
@@ -26,6 +30,14 @@ async def health():
     return {
         "status": "healthy",
         "service": "{{ cookiecutter.project_name }}"
+    }
+
+
+@app.get("/hello")
+async def hello():
+    """Custom hello endpoint."""
+    return {
+        "message": "hello, welcome to my IDP"
     }
 
 

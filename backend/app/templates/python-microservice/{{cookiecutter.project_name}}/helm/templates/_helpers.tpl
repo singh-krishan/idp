@@ -19,4 +19,23 @@ Create a default fully qualified app name.
 {{- printf "%s-%s" .Release.Name $name | trunc 63 | trimSuffix "-" }}
 {{- end }}
 {{- end }}
+{{- end }}
+
+{{/*
+Common labels
+*/}}
+{{- define "chart.labels" -}}
+helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+app.kubernetes.io/name: {{ include "chart.name" . }}
+app.kubernetes.io/instance: {{ .Release.Name }}
+app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+app.kubernetes.io/managed-by: {{ .Release.Service }}
+{{- end }}
+
+{{/*
+Selector labels
+*/}}
+{{- define "chart.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "chart.name" . }}
+app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}{% endraw %}

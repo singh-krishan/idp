@@ -1,0 +1,28 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {% raw %}{{ include "chart.fullname" . }}{% endraw %}
+  namespace: {% raw %}{{ .Values.namespace }}{% endraw %}
+  labels:
+    {% raw %}{{- include "chart.labels" . | nindent 4 }}{% endraw %}
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+spec:
+  ingressClassName: nginx
+  tls:
+  - hosts:
+    - {% raw %}{{ .Values.ingress.host }}{% endraw %}
+    secretName: {% raw %}{{ .Values.ingress.tlsSecretName }}{% endraw %}
+  rules:
+  - host: {% raw %}{{ .Values.ingress.host }}{% endraw %}
+    http:
+      paths:
+      - path: /{% raw %}{{ .Values.ingress.path }}{% endraw %}(/|$)(.*)
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: {% raw %}{{ include "chart.fullname" . }}{% endraw %}
+            port:
+              number: 80

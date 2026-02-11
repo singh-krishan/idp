@@ -54,10 +54,14 @@ jobs:
             type=sha,prefix=,format=long
             type=raw,value=latest
 
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
       - name: Build and push Docker image
         uses: docker/build-push-action@v4
         with:
           context: .
+          platforms: linux/amd64
           push: true
           tags: {% raw %}${{ steps.meta.outputs.tags }}{% endraw %}
           labels: {% raw %}${{ steps.meta.outputs.labels }}{% endraw %}

@@ -14,6 +14,9 @@ spec:
       labels:
         app: {{ cookiecutter.project_name }}
       annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: {% raw %}"{{ .Values.service.targetPort }}"{% endraw %}
+        prometheus.io/path: "/metrics"
         {% raw %}{{- toYaml .Values.podAnnotations | nindent 8 }}{% endraw %}
     spec:
       containers:
