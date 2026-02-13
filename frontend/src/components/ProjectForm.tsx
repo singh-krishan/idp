@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { CreateProjectRequest, Template } from '../types/project';
 import { templatesApi, projectsApi } from '../services/api';
 import TemplateSelector from './TemplateSelector';
+import OpenAPIUpload from './OpenAPIUpload';
 
 interface ProjectFormProps {
   onSuccess: () => void;
@@ -11,6 +12,7 @@ export default function ProjectForm({ onSuccess }: ProjectFormProps) {
   const [templates, setTemplates] = useState<Template[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [openapiFile, setOpenapiFile] = useState<File | null>(null);
 
   const [formData, setFormData] = useState<CreateProjectRequest>({
     name: '',
@@ -38,7 +40,29 @@ export default function ProjectForm({ onSuccess }: ProjectFormProps) {
     setError(null);
 
     try {
-      await projectsApi.createProject(formData);
+      // Check if this is an OpenAPI template
+      const isOpenAPITemplate = selectedTemplate?.requires_openapi_upload;
+
+      if (isOpenAPITemplate) {
+        // Validate file is uploaded
+        if (!openapiFile) {
+          setError('Please upload an OpenAPI specification file');
+          setLoading(false);
+          return;
+        }
+
+        // Use OpenAPI endpoint
+        await projectsApi.createProjectFromOpenAPI({
+          name: formData.name,
+          description: formData.description,
+          port: formData.variables?.port || '8000',
+          openapi_file: openapiFile,
+        });
+      } else {
+        // Use standard endpoint
+        await projectsApi.createProject(formData);
+      }
+
       // Reset form
       setFormData({
         name: '',
@@ -46,6 +70,7 @@ export default function ProjectForm({ onSuccess }: ProjectFormProps) {
         template_type: '',
         variables: {},
       });
+      setOpenapiFile(null);
       onSuccess();
     } catch (err: any) {
       setError(err.response?.data?.detail || err.message || 'Failed to create project');
@@ -107,7 +132,16 @@ export default function ProjectForm({ onSuccess }: ProjectFormProps) {
           onSelect={(templateName) => setFormData({ ...formData, template_type: templateName })}
         />
 
-        {selectedTemplate && selectedTemplate.variables.length > 0 && (
+        {/* OpenAPI file upload for openapi-microservice template */}
+        {selectedTemplate?.requires_openapi_upload && (
+          <OpenAPIUpload
+            onFileSelected={setOpenapiFile}
+            selectedFile={openapiFile}
+            error={null}
+          />
+        )}
+
+        {selectedTemplate && selectedTemplate.variables.length > 0 && !selectedTemplate.requires_openapi_upload && (
           <div className="space-y-4 p-4 bg-gray-50 rounded-lg">
             <h3 className="font-medium text-gray-900">Template Configuration</h3>
             {selectedTemplate.variables.map((variable) => (
@@ -133,9 +167,17 @@ export default function ProjectForm({ onSuccess }: ProjectFormProps) {
 
         <button
           type="submit"
-          disabled={loading || !formData.name || !formData.template_type}
+          disabled={
+            loading ||
+            !formData.name ||
+            !formData.template_type ||
+            (selectedTemplate?.requires_openapi_upload && !openapiFile)
+          }
           className={`w-full py-3 px-4 rounded-md font-medium text-white transition-colors ${
-            loading || !formData.name || !formData.template_type
+            loading ||
+            !formData.name ||
+            !formData.template_type ||
+            (selectedTemplate?.requires_openapi_upload && !openapiFile)
               ? 'bg-gray-400 cursor-not-allowed'
               : 'bg-blue-600 hover:bg-blue-700'
           }`}

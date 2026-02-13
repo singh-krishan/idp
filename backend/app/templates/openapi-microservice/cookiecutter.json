@@ -1,0 +1,8 @@
+{
+  "project_name": "my-api",
+  "description": "An API microservice generated from OpenAPI specification",
+  "port": "8000",
+  "author": "IDP Platform",
+  "github_org": "your-github-org",
+  "_openapi_template": true
+}

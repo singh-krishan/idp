@@ -73,11 +73,15 @@ class TemplateEngine:
                 "description": f"{key.replace('_', ' ').title()}"
             })
 
+        # Check if template requires OpenAPI upload
+        is_openapi = config.get("_openapi_template", False)
+
         return {
             "name": template_path.name,
             "display_name": template_path.name.replace("-", " ").title(),
             "description": f"{template_path.name} template",
-            "variables": variables
+            "variables": variables,
+            "requires_openapi_upload": is_openapi
         }
 
     def render_template(
@@ -109,6 +113,7 @@ class TemplateEngine:
         # Prepare cookiecutter context
         extra_context = variables or {}
         extra_context["project_name"] = project_name
+        extra_context["github_org"] = settings.github_org
 
         # Create unique output directory
         output_dir = self.temp_dir / f"{project_name}-{os.urandom(4).hex()}"

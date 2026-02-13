@@ -25,13 +25,18 @@ export default function TemplateSelector({ templates, selectedTemplate, onSelect
             }`}
           >
             <div className="flex items-start justify-between">
-              <div>
+              <div className="flex-1">
                 <h3 className="font-semibold text-lg text-gray-900">
                   {template.display_name}
                 </h3>
                 <p className="text-sm text-gray-600 mt-1">
                   {template.description}
                 </p>
+                {template.requires_openapi_upload && (
+                  <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-800 mt-2">
+                    📄 Requires OpenAPI Spec
+                  </span>
+                )}
               </div>
               {selectedTemplate === template.name && (
                 <svg className="w-6 h-6 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
