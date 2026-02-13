@@ -158,10 +158,11 @@ class OpenAPIGeneratorService:
             Python source code string for models.py, or empty string if no schemas.
         """
         output = io.StringIO()
+        input_stream = io.StringIO(spec_content)
 
         try:
             generate(
-                input_=spec_content,
+                input_=input_stream,
                 input_file_type=InputFileType.OpenAPI,
                 output=output,
                 output_model_type=DataModelType.PydanticV2BaseModel,
@@ -260,25 +261,26 @@ class OpenAPIGeneratorService:
                 # Extract request body
                 request_body = None
                 request_body_content = operation.get("requestBody", {}).get("content", {})
-                if "application/json" in request_body_content:
+                if has_models and "application/json" in request_body_content:
                     schema = request_body_content["application/json"].get("schema", {})
                     if "$ref" in schema:
                         request_body = self._extract_model_name(schema["$ref"])
 
                 # Extract response model
                 response_model = None
-                responses = operation.get("responses", {})
-                for status in ["200", "201", "202"]:
-                    if status in responses:
-                        response_content = responses[status].get("content", {})
-                        if "application/json" in response_content:
-                            schema = response_content["application/json"].get("schema", {})
-                            if "$ref" in schema:
-                                response_model = self._extract_model_name(schema["$ref"])
-                            elif schema.get("type") == "array" and "$ref" in schema.get("items", {}):
-                                item_model = self._extract_model_name(schema["items"]["$ref"])
-                                response_model = f"List[{item_model}]"
-                        break
+                if has_models:
+                    responses = operation.get("responses", {})
+                    for status in ["200", "201", "202"]:
+                        if status in responses:
+                            response_content = responses[status].get("content", {})
+                            if "application/json" in response_content:
+                                schema = response_content["application/json"].get("schema", {})
+                                if "$ref" in schema:
+                                    response_model = self._extract_model_name(schema["$ref"])
+                                elif schema.get("type") == "array" and "$ref" in schema.get("items", {}):
+                                    item_model = self._extract_model_name(schema["items"]["$ref"])
+                                    response_model = f"List[{item_model}]"
+                            break
 
                 status_code = 201 if method == "post" else None
 

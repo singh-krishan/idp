@@ -1,13 +1,34 @@
-import { useState } from 'react';
-import ProjectForm from './components/ProjectForm';
-import ProjectList from './components/ProjectList';
+import { BrowserRouter, Routes, Route, Navigate, Link } from 'react-router-dom'
+import { useState } from 'react'
+import Login from './components/Login'
+import PasswordReset from './components/PasswordReset'
+import Home from './pages/Home'
+import Dashboard from './pages/Dashboard'
+import Analytics from './pages/Analytics'
+import ProjectDetail from './pages/ProjectDetail'
+import ProjectForm from './components/ProjectForm'
+import ProjectList from './components/ProjectList'
+import { useAuth } from './contexts/AuthContext'
 
-function App() {
-  const [refreshTrigger, setRefreshTrigger] = useState(0);
+function ProtectedRoute({ children }: { children: React.ReactNode }) {
+  const { user, isLoading } = useAuth()
 
-  const handleProjectCreated = () => {
-    setRefreshTrigger(prev => prev + 1);
-  };
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-indigo-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading...</p>
+        </div>
+      </div>
+    )
+  }
+
+  return user ? <>{children}</> : <Navigate to="/login" />
+}
+
+function AppLayout({ children }: { children: React.ReactNode }) {
+  const { user, logout } = useAuth()
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
@@ -17,43 +38,127 @@ function App() {
           <div className="flex items-center justify-between h-20">
             <div className="flex items-center space-x-4">
               {/* Logo */}
-              <div className="flex-shrink-0">
-                <svg className="h-12 w-12" viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <rect width="50" height="50" rx="10" fill="white" fillOpacity="0.1"/>
-                  <path d="M25 10L15 20H20V35H30V20H35L25 10Z" fill="white"/>
-                  <circle cx="25" cy="40" r="2" fill="white"/>
-                  <path d="M12 15L18 15" stroke="white" strokeWidth="2" strokeLinecap="round"/>
-                  <path d="M32 15L38 15" stroke="white" strokeWidth="2" strokeLinecap="round"/>
-                </svg>
-              </div>
+              <Link to="/home" className="flex items-center space-x-4">
+                <div className="flex-shrink-0">
+                  <svg className="h-12 w-12" viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="50" height="50" rx="10" fill="white" fillOpacity="0.1"/>
+                    <path d="M25 10L15 20H20V35H30V20H35L25 10Z" fill="white"/>
+                    <circle cx="25" cy="40" r="2" fill="white"/>
+                    <path d="M12 15L18 15" stroke="white" strokeWidth="2" strokeLinecap="round"/>
+                    <path d="M32 15L38 15" stroke="white" strokeWidth="2" strokeLinecap="round"/>
+                  </svg>
+                </div>
 
-              {/* Brand */}
-              <div>
-                <h1 className="text-2xl font-bold text-white tracking-tight">
-                  DevForge
-                </h1>
-                <p className="text-indigo-100 text-sm font-medium">
-                  Internal Developer Platform
-                </p>
-              </div>
+                {/* Brand */}
+                <div>
+                  <h1 className="text-2xl font-bold text-white tracking-tight">
+                    DevForge
+                  </h1>
+                  <p className="text-indigo-100 text-sm font-medium">
+                    Internal Developer Platform
+                  </p>
+                </div>
+              </Link>
             </div>
 
             {/* Navigation Links */}
             <div className="hidden md:flex items-center space-x-6">
-              <a href="#" className="text-white hover:text-indigo-100 transition-colors font-medium">
+              <Link
+                to="/home"
+                className="text-white hover:text-indigo-100 transition-colors font-medium"
+              >
                 Home
-              </a>
-              <a href="#" className="text-indigo-100 hover:text-white transition-colors font-medium">
-                Catalog
-              </a>
-              <a href="#" className="text-indigo-100 hover:text-white transition-colors font-medium">
-                Docs
-              </a>
+              </Link>
+              <Link
+                to="/create"
+                className="text-white hover:text-indigo-100 transition-colors font-medium"
+              >
+                Create Project
+              </Link>
+              <Link
+                to="/dashboard"
+                className="text-white hover:text-indigo-100 transition-colors font-medium"
+              >
+                Dashboard
+              </Link>
+              {user?.role === 'admin' && (
+                <Link
+                  to="/analytics"
+                  className="text-white hover:text-indigo-100 transition-colors font-medium"
+                >
+                  Analytics
+                </Link>
+              )}
+              <div className="flex items-center space-x-4 text-white border-l border-white/20 pl-6">
+                <span className="text-sm text-indigo-100">Welcome, {user?.username}</span>
+                <button
+                  onClick={logout}
+                  className="px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg transition-colors text-sm font-medium"
+                >
+                  Logout
+                </button>
+              </div>
             </div>
           </div>
         </div>
       </nav>
 
+      {/* Main Content */}
+      <main>
+        {children}
+      </main>
+
+      {/* Footer */}
+      <footer className="bg-white border-t border-gray-200 mt-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="flex flex-col md:flex-row justify-between items-center">
+            <div className="flex items-center space-x-3 mb-4 md:mb-0">
+              <svg className="h-8 w-8" viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect width="50" height="50" rx="10" fill="url(#gradient)"/>
+                <path d="M25 10L15 20H20V35H30V20H35L25 10Z" fill="white"/>
+                <circle cx="25" cy="40" r="2" fill="white"/>
+                <defs>
+                  <linearGradient id="gradient" x1="0" y1="0" x2="50" y2="50">
+                    <stop offset="0%" stopColor="#4F46E5"/>
+                    <stop offset="100%" stopColor="#EC4899"/>
+                  </linearGradient>
+                </defs>
+              </svg>
+              <div>
+                <div className="text-sm font-semibold text-gray-900">DevForge Platform</div>
+                <div className="text-xs text-gray-500">v0.1.0</div>
+              </div>
+            </div>
+
+            <div className="flex items-center space-x-6 text-sm text-gray-500">
+              <a href="#" className="hover:text-indigo-600 transition-colors">Documentation</a>
+              <a href="#" className="hover:text-indigo-600 transition-colors">API Reference</a>
+              <a href="https://github.com" target="_blank" rel="noopener noreferrer" className="hover:text-indigo-600 transition-colors">
+                GitHub
+              </a>
+            </div>
+          </div>
+
+          <div className="mt-6 pt-6 border-t border-gray-200 text-center">
+            <p className="text-sm text-gray-500">
+              Powered by React, FastAPI, Kubernetes & ArgoCD • Built with ❤️ using Claude
+            </p>
+          </div>
+        </div>
+      </footer>
+    </div>
+  )
+}
+
+function CreateProjectPage() {
+  const [refreshTrigger, setRefreshTrigger] = useState(0)
+
+  const handleProjectCreated = () => {
+    setRefreshTrigger(prev => prev + 1)
+  }
+
+  return (
+    <AppLayout>
       {/* Hero Section */}
       <div className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -86,7 +191,7 @@ function App() {
       </div>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Left Column */}
           <div className="space-y-6">
@@ -98,48 +203,67 @@ function App() {
             <ProjectList refreshTrigger={refreshTrigger} />
           </div>
         </div>
-      </main>
-
-      {/* Footer */}
-      <footer className="bg-white border-t border-gray-200 mt-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="flex flex-col md:flex-row justify-between items-center">
-            <div className="flex items-center space-x-3 mb-4 md:mb-0">
-              <svg className="h-8 w-8" viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <rect width="50" height="50" rx="10" fill="url(#gradient)"/>
-                <path d="M25 10L15 20H20V35H30V20H35L25 10Z" fill="white"/>
-                <circle cx="25" cy="40" r="2" fill="white"/>
-                <defs>
-                  <linearGradient id="gradient" x1="0" y1="0" x2="50" y2="50">
-                    <stop offset="0%" stopColor="#4F46E5"/>
-                    <stop offset="100%" stopColor="#EC4899"/>
-                  </linearGradient>
-                </defs>
-              </svg>
-              <div>
-                <div className="text-sm font-semibold text-gray-900">DevForge Platform</div>
-                <div className="text-xs text-gray-500">v0.1.0</div>
-              </div>
-            </div>
-
-            <div className="flex items-center space-x-6 text-sm text-gray-500">
-              <a href="#" className="hover:text-indigo-600 transition-colors">Documentation</a>
-              <a href="#" className="hover:text-indigo-600 transition-colors">API Reference</a>
-              <a href="https://github.com/singh-krishan/idp" target="_blank" rel="noopener noreferrer" className="hover:text-indigo-600 transition-colors">
-                GitHub
-              </a>
-            </div>
-          </div>
-
-          <div className="mt-6 pt-6 border-t border-gray-200 text-center">
-            <p className="text-sm text-gray-500">
-              Powered by React, FastAPI, Kubernetes & ArgoCD • Built with ❤️ using Claude
-            </p>
-          </div>
-        </div>
-      </footer>
-    </div>
-  );
+      </div>
+    </AppLayout>
+  )
 }
 
-export default App;
+function App() {
+  const { user, isLoading } = useAuth()
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-indigo-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading...</p>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/login" element={!user ? <Login /> : <Navigate to="/home" />} />
+        <Route path="/password-reset" element={!user ? <PasswordReset /> : <Navigate to="/home" />} />
+        <Route path="/home" element={
+          <ProtectedRoute>
+            <AppLayout>
+              <Home />
+            </AppLayout>
+          </ProtectedRoute>
+        } />
+        <Route path="/dashboard" element={
+          <ProtectedRoute>
+            <AppLayout>
+              <Dashboard />
+            </AppLayout>
+          </ProtectedRoute>
+        } />
+        <Route path="/create" element={
+          <ProtectedRoute>
+            <CreateProjectPage />
+          </ProtectedRoute>
+        } />
+        <Route path="/projects/:id" element={
+          <ProtectedRoute>
+            <AppLayout>
+              <ProjectDetail />
+            </AppLayout>
+          </ProtectedRoute>
+        } />
+        <Route path="/analytics" element={
+          <ProtectedRoute>
+            <AppLayout>
+              <Analytics />
+            </AppLayout>
+          </ProtectedRoute>
+        } />
+        <Route path="/" element={<Navigate to="/home" />} />
+      </Routes>
+    </BrowserRouter>
+  )
+}
+
+export default App

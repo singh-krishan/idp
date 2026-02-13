@@ -10,6 +10,7 @@ export default function ProjectList({ refreshTrigger }: ProjectListProps) {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   useEffect(() => {
     loadProjects();
@@ -25,6 +26,27 @@ export default function ProjectList({ refreshTrigger }: ProjectListProps) {
       setError('Failed to load projects: ' + (err.response?.data?.detail || err.message));
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDelete = async (project: Project) => {
+    const confirmMessage = `Are you sure you want to delete "${project.name}"?\n\nThis will remove:\n- ArgoCD application and k3s resources\n- GitHub repository\n- Database record\n\nThis action cannot be undone.`;
+
+    if (!window.confirm(confirmMessage)) {
+      return;
+    }
+
+    try {
+      setDeletingId(project.id);
+      await projectsApi.deleteProject(project.id);
+
+      // Remove from local state
+      setProjects(projects.filter(p => p.id !== project.id));
+      setError(null);
+    } catch (err: any) {
+      setError('Failed to delete project: ' + (err.response?.data?.detail || err.message));
+    } finally {
+      setDeletingId(null);
     }
   };
 
@@ -113,13 +135,27 @@ export default function ProjectList({ refreshTrigger }: ProjectListProps) {
             className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow"
           >
             <div className="flex justify-between items-start mb-2">
-              <div>
+              <div className="flex-1">
                 <h3 className="text-lg font-semibold text-gray-900">{project.name}</h3>
                 {project.description && (
                   <p className="text-sm text-gray-600 mt-1">{project.description}</p>
                 )}
               </div>
-              {getStatusBadge(project.status)}
+              <div className="flex items-center space-x-3">
+                {getStatusBadge(project.status)}
+                <button
+                  onClick={() => handleDelete(project)}
+                  disabled={deletingId === project.id}
+                  className={`px-2 py-1 rounded-full text-xs font-medium transition-colors ${
+                    deletingId === project.id
+                      ? 'bg-gray-200 text-gray-800 cursor-not-allowed'
+                      : 'bg-red-200 text-red-800 hover:bg-red-300'
+                  }`}
+                  title="Delete project"
+                >
+                  {deletingId === project.id ? 'DELETING...' : 'DELETE'}
+                </button>
+              </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4 mt-3 text-sm">

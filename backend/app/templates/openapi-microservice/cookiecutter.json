@@ -4,5 +4,6 @@
   "port": "8000",
   "author": "IDP Platform",
   "github_org": "your-github-org",
-  "_openapi_template": true
+  "_openapi_template": true,
+  "_skip_variables": ["project_name", "description", "author", "github_org"]
 }

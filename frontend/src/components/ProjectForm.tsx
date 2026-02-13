@@ -92,58 +92,64 @@ export default function ProjectForm({ onSuccess }: ProjectFormProps) {
       )}
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        <div>
-          <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
-            Project Name *
-          </label>
-          <input
-            type="text"
-            id="name"
-            required
-            value={formData.name}
-            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="my-service"
-            pattern="[a-z0-9-_]+"
-            title="Only lowercase letters, numbers, hyphens, and underscores"
-          />
-          <p className="text-xs text-gray-500 mt-1">
-            Lowercase letters, numbers, hyphens, and underscores only
-          </p>
-        </div>
-
-        <div>
-          <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
-            Description
-          </label>
-          <textarea
-            id="description"
-            value={formData.description}
-            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            rows={3}
-            placeholder="A brief description of your project"
-          />
-        </div>
-
+        {/* Step 1: Template Selection */}
         <TemplateSelector
           templates={templates}
           selectedTemplate={formData.template_type}
           onSelect={(templateName) => setFormData({ ...formData, template_type: templateName })}
         />
 
-        {/* OpenAPI file upload for openapi-microservice template */}
-        {selectedTemplate?.requires_openapi_upload && (
-          <OpenAPIUpload
-            onFileSelected={setOpenapiFile}
-            selectedFile={openapiFile}
-            error={null}
-          />
-        )}
-
-        {selectedTemplate && selectedTemplate.variables.length > 0 && !selectedTemplate.requires_openapi_upload && (
+        {/* Step 2: Configure Project (shown after template selection) */}
+        {selectedTemplate && (
           <div className="space-y-4 p-4 bg-gray-50 rounded-lg">
-            <h3 className="font-medium text-gray-900">Template Configuration</h3>
+            <h3 className="font-medium text-gray-900 text-lg">Configure Project</h3>
+
+            {/* Project Name */}
+            <div>
+              <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
+                Project Name *
+              </label>
+              <input
+                type="text"
+                id="name"
+                required
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="my-service"
+                pattern="[a-z0-9-_]+"
+                title="Only lowercase letters, numbers, hyphens, and underscores"
+              />
+              <p className="text-xs text-gray-500 mt-1">
+                Lowercase letters, numbers, hyphens, and underscores only
+              </p>
+            </div>
+
+            {/* Description */}
+            <div>
+              <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
+                Description
+              </label>
+              <textarea
+                id="description"
+                value={formData.description}
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                rows={3}
+                placeholder="A brief description of your project"
+              />
+            </div>
+
+            {/* OpenAPI file upload for openapi-microservice template */}
+            {selectedTemplate.requires_openapi_upload && (
+              <OpenAPIUpload
+                onFileSelected={setOpenapiFile}
+                selectedFile={openapiFile}
+                error={null}
+              />
+            )}
+
+            {/* Template Variables (Port, Author, Github Org, etc.) */}
             {selectedTemplate.variables.map((variable) => (
               <div key={variable.name}>
                 <label htmlFor={variable.name} className="block text-sm font-medium text-gray-700 mb-1">

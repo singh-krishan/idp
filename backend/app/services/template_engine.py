@@ -62,8 +62,14 @@ class TemplateEngine:
 
         # Extract variables from cookiecutter.json
         variables = []
+        skip_vars = config.get("_skip_variables", [])
+
         for key, value in config.items():
             if key.startswith("_"):
+                continue
+
+            # Skip variables that are in the skip list
+            if key in skip_vars:
                 continue
 
             variables.append({

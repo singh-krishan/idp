@@ -28,7 +28,8 @@ class Settings(BaseSettings):
     argocd_username: str = "admin"
     argocd_password: str = ""
     argocd_namespace: str = "argocd"
-    argocd_verify_ssl: bool = False
+    argocd_verify_ssl: bool = True  # SSL verification enabled by default
+    argocd_ca_cert_path: Optional[str] = None  # Path to custom CA certificate for self-signed certs
 
     # Kubernetes Configuration
     kube_context: str = "kind-idp-cluster"
@@ -36,6 +37,12 @@ class Settings(BaseSettings):
 
     # Container Registry
     container_registry: str = "ghcr.io"
+
+    # Authentication
+    jwt_secret_key: str = "your-secret-key-change-this-in-production-use-openssl-rand-hex-32"
+    jwt_algorithm: str = "HS256"
+    access_token_expire_minutes: int = 480  # 8 hours for development
+    refresh_token_expire_days: int = 7
 
     # CORS
     cors_origins: Union[list[str], str] = "http://localhost:5173,http://localhost:3000"

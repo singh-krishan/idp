@@ -284,22 +284,116 @@ idp/
 
 See existing templates for reference.
 
-## Monitoring Setup
+## Observability
 
-### Option 1: Dynatrace (Production)
+The IDP platform includes comprehensive monitoring with Prometheus and Grafana deployed to Kubernetes with HTTPS access.
 
-See [infrastructure/dynatrace/setup.md](infrastructure/dynatrace/setup.md) for full Dynatrace integration.
+### Access Monitoring Dashboards
 
-### Option 2: Prometheus + Grafana (Development)
+**Production Access (HTTPS):**
+- **Prometheus**: https://my-idp.duckdns.org/prometheus
+- **Grafana**: https://my-idp.duckdns.org/grafana
+  - Username: `admin`
+  - Password: (set in `infrastructure/kubernetes/monitoring/grafana/secret.yaml`)
+
+**Local Access (Port-Forward):**
+```bash
+# Prometheus
+kubectl port-forward -n monitoring svc/prometheus 9090:9090
+# Open http://localhost:9090
+
+# Grafana
+kubectl port-forward -n monitoring svc/grafana 3000:3000
+# Open http://localhost:3000
+```
+
+### Deploy Monitoring Stack
+
+The monitoring stack is deployed separately from the main application:
 
 ```bash
-helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
-helm install prometheus prometheus-community/kube-prometheus-stack -n monitoring --create-namespace
+cd infrastructure/kubernetes/monitoring
 
-# Access Grafana
-kubectl port-forward -n monitoring svc/prometheus-grafana 3000:80
-# Username: admin, Password: prom-operator
+# Before deploying, configure:
+# 1. Get EC2 private IP for backend scraping
+ssh -i ~/.ssh/idp-demo-key-new.pem ec2-user@13.42.36.97 "hostname -I | awk '{print \$1}'"
+
+# 2. Update prometheus/configmap.yaml
+# Replace <EC2_PRIVATE_IP> with actual IP
+
+# 3. Set Grafana password in grafana/secret.yaml
+
+# Deploy the stack
+bash deploy.sh
+
+# Or manually apply
+kubectl apply -f namespace.yaml
+kubectl apply -f prometheus/
+kubectl apply -f grafana/
 ```
+
+### What's Monitored
+
+**Backend Metrics** (IDP Platform):
+- HTTP request rate and latency (p50, p95)
+- Project creation success/failure counts
+- Background task activity
+- External API performance (GitHub, ArgoCD)
+
+**Deployed Services**:
+- Auto-discovered via Kubernetes service discovery
+- Services with `prometheus.io/scrape=true` annotation
+- Custom metrics from your microservices
+
+### Grafana Dashboards
+
+**Pre-configured Dashboards**:
+- **IDP Platform Metrics**: Overview of platform health and performance
+  - HTTP request metrics
+  - Project creation workflow
+  - External API latency
+  - Background task monitoring
+
+**Adding Custom Dashboards**:
+1. Create dashboard JSON file
+2. Add to `infrastructure/kubernetes/monitoring/grafana/` as ConfigMap
+3. Apply: `kubectl apply -f grafana/configmap-dashboard-custom.yaml`
+4. Restart Grafana: `kubectl rollout restart deployment/grafana -n monitoring`
+
+### Troubleshooting Monitoring
+
+**Prometheus not scraping backend:**
+```bash
+# Check Prometheus targets
+kubectl port-forward -n monitoring svc/prometheus 9090:9090
+# Visit http://localhost:9090/targets
+
+# Verify EC2 connectivity from Prometheus pod
+kubectl exec -n monitoring -it deployment/prometheus -- wget -O- http://<EC2_IP>:8000/metrics
+```
+
+**Grafana dashboard shows no data:**
+```bash
+# Check datasource connection
+kubectl logs -n monitoring -l app=grafana
+
+# Verify Prometheus is accessible
+kubectl exec -n monitoring -it deployment/grafana -- wget -O- http://prometheus.monitoring.svc.cluster.local:9090/-/healthy
+```
+
+**TLS certificate issues:**
+```bash
+# Check certificate status
+kubectl get certificate -n monitoring
+kubectl describe certificate my-idp-tls -n monitoring
+
+# Check cert-manager logs
+kubectl logs -n cert-manager deployment/cert-manager
+```
+
+### Alternative: Dynatrace (Production)
+
+For enterprise monitoring, see [infrastructure/dynatrace/setup.md](infrastructure/dynatrace/setup.md) for full Dynatrace integration.
 
 ## Troubleshooting
 

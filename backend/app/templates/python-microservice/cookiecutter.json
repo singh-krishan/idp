@@ -3,5 +3,6 @@
   "description": "A Python microservice",
   "port": "8000",
   "author": "IDP Platform",
-  "github_org": "your-github-org"
+  "github_org": "your-github-org",
+  "_skip_variables": ["project_name", "description"]
 }
