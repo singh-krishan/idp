@@ -73,45 +73,41 @@ export default function PasswordReset() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center px-4">
+    <div className="min-h-screen bg-govuk-background flex items-center justify-center px-4">
       <div className="max-w-md w-full">
         <div className="text-center mb-8">
           <div className="flex justify-center mb-4">
             <svg className="h-16 w-16" viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <rect width="50" height="50" rx="10" fill="url(#gradient)"/>
+              <rect width="50" height="50" rx="10" fill="#1d70b8"/>
               <path d="M25 10L15 20H20V35H30V20H35L25 10Z" fill="white"/>
               <circle cx="25" cy="40" r="2" fill="white"/>
-              <defs>
-                <linearGradient id="gradient" x1="0" y1="0" x2="50" y2="50">
-                  <stop offset="0%" stopColor="#4F46E5"/>
-                  <stop offset="100%" stopColor="#EC4899"/>
-                </linearGradient>
-              </defs>
             </svg>
           </div>
-          <h1 className="text-3xl font-bold text-gray-900">Password Reset</h1>
-          <p className="text-gray-600 mt-2">Reset your account password</p>
+          <h1 className="text-3xl font-bold text-govuk-text">Password Reset</h1>
+          <p className="text-govuk-secondary-text mt-2">Reset your account password</p>
         </div>
 
-        <div className="bg-white rounded-xl shadow-xl p-8">
+        <div className="bg-white rounded-none shadow-sm border border-govuk-border p-8">
           {error && (
-            <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg mb-6">
-              {error}
+            <div role="alert" className="bg-[#fce8e8] border-l-4 border-govuk-error text-govuk-error px-4 py-3 rounded-none mb-6">
+              <p className="font-bold">There is a problem</p>
+              <p>{error}</p>
             </div>
           )}
 
           {success && (
-            <div className="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-lg mb-6">
-              {success}
+            <div className="bg-[#e7f2ed] border-l-4 border-govuk-success text-govuk-success px-4 py-3 rounded-none mb-6">
+              <p className="font-bold">Success</p>
+              <p>{success}</p>
             </div>
           )}
 
           {step === 'request' ? (
             <form onSubmit={handleRequestReset} className="space-y-4">
-              <h2 className="text-2xl font-bold text-gray-900 mb-4">Request Reset Token</h2>
+              <h2 className="text-2xl font-bold text-govuk-text mb-4">Request Reset Token</h2>
 
               <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="email" className="block text-sm font-medium text-govuk-text mb-1">
                   Email Address
                 </label>
                 <input
@@ -121,7 +117,7 @@ export default function PasswordReset() {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                  className="input-govuk w-full"
                   placeholder="you@example.com"
                 />
               </div>
@@ -129,18 +125,18 @@ export default function PasswordReset() {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-2 px-4 rounded-lg hover:from-indigo-700 hover:to-purple-700 transition-all duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                className="btn-govuk w-full disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isLoading ? 'Requesting...' : 'Request Reset Token'}
               </button>
 
               {resetToken && (
-                <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-                  <p className="text-sm font-medium text-yellow-900 mb-2">Your Reset Token:</p>
-                  <code className="block p-2 bg-white border border-yellow-300 rounded text-xs break-all">
+                <div className="mt-4 p-4 bg-[#fff7e6] border-l-4 border-govuk-warning rounded-none">
+                  <p className="text-sm font-medium text-govuk-text mb-2">Your Reset Token:</p>
+                  <code className="block p-2 bg-white border border-govuk-border rounded-none text-xs break-all">
                     {resetToken}
                   </code>
-                  <p className="text-xs text-yellow-800 mt-2">
+                  <p className="text-xs text-govuk-text mt-2">
                     Copy this token and use it in the next step. It expires in 1 hour.
                   </p>
                 </div>
@@ -149,17 +145,17 @@ export default function PasswordReset() {
               <button
                 type="button"
                 onClick={() => setStep('reset')}
-                className="w-full text-indigo-600 hover:text-indigo-800 font-medium text-sm mt-2"
+                className="w-full text-govuk-link hover:text-govuk-link-hover font-medium text-sm mt-2 underline"
               >
                 I already have a reset token
               </button>
             </form>
           ) : (
             <form onSubmit={handleResetPassword} className="space-y-4">
-              <h2 className="text-2xl font-bold text-gray-900 mb-4">Reset Password</h2>
+              <h2 className="text-2xl font-bold text-govuk-text mb-4">Reset Password</h2>
 
               <div>
-                <label htmlFor="resetToken" className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="resetToken" className="block text-sm font-medium text-govuk-text mb-1">
                   Reset Token
                 </label>
                 <input
@@ -169,13 +165,13 @@ export default function PasswordReset() {
                   required
                   value={resetToken}
                   onChange={(e) => setResetToken(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                  className="input-govuk w-full"
                   placeholder="Paste your reset token here"
                 />
               </div>
 
               <div>
-                <label htmlFor="newPassword" className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="newPassword" className="block text-sm font-medium text-govuk-text mb-1">
                   New Password
                 </label>
                 <input
@@ -185,13 +181,13 @@ export default function PasswordReset() {
                   required
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                  className="input-govuk w-full"
                   placeholder="••••••••"
                 />
               </div>
 
               <div>
-                <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="confirmPassword" className="block text-sm font-medium text-govuk-text mb-1">
                   Confirm New Password
                 </label>
                 <input
@@ -201,7 +197,7 @@ export default function PasswordReset() {
                   required
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                  className="input-govuk w-full"
                   placeholder="••••••••"
                 />
               </div>
@@ -209,7 +205,7 @@ export default function PasswordReset() {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-2 px-4 rounded-lg hover:from-indigo-700 hover:to-purple-700 transition-all duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                className="btn-govuk w-full disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isLoading ? 'Resetting...' : 'Reset Password'}
               </button>
@@ -217,7 +213,7 @@ export default function PasswordReset() {
               <button
                 type="button"
                 onClick={() => setStep('request')}
-                className="w-full text-indigo-600 hover:text-indigo-800 font-medium text-sm mt-2"
+                className="w-full text-govuk-link hover:text-govuk-link-hover font-medium text-sm mt-2 underline"
               >
                 ← Back to request token
               </button>
@@ -225,13 +221,13 @@ export default function PasswordReset() {
           )}
 
           <div className="mt-6 text-center">
-            <a href="/" className="text-indigo-600 hover:text-indigo-800 font-medium text-sm">
+            <a href="/" className="text-govuk-link hover:text-govuk-link-hover font-medium text-sm underline">
               Back to Login
             </a>
           </div>
         </div>
 
-        <div className="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4 text-sm text-blue-800">
+        <div className="mt-6 bg-[#d2e4f5] border-l-4 border-govuk-blue rounded-none p-4 text-sm text-govuk-text">
           <p className="font-medium mb-1">Demo Mode</p>
           <p>In production, the reset token would be sent to your email. For demo purposes, it's displayed on screen.</p>
         </div>

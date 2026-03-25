@@ -35,9 +35,14 @@ class GitHubService:
             self.is_org = True
             logger.info(f"Using GitHub organization: {self.org_name}")
         except GithubException:
-            self.org = self.client.get_user(self.org_name)
-            self.is_org = False
-            logger.info(f"Using GitHub user: {self.org_name}")
+            try:
+                self.org = self.client.get_user(self.org_name)
+                self.is_org = False
+                logger.info(f"Using GitHub user: {self.org_name}")
+            except GithubException as e:
+                logger.warning(f"GitHub authentication failed: {e}. GitHub integration will be degraded.")
+                self.org = None
+                self.is_org = False
 
     def create_repository(
         self,

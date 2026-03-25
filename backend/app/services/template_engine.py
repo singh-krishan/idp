@@ -79,15 +79,17 @@ class TemplateEngine:
                 "description": f"{key.replace('_', ' ').title()}"
             })
 
-        # Check if template requires OpenAPI upload
+        # Check if template requires file uploads
         is_openapi = config.get("_openapi_template", False)
+        is_camel_yaml = config.get("_camel_yaml_template", False)
 
         return {
             "name": template_path.name,
             "display_name": template_path.name.replace("-", " ").title(),
             "description": f"{template_path.name} template",
             "variables": variables,
-            "requires_openapi_upload": is_openapi
+            "requires_openapi_upload": is_openapi,
+            "requires_camel_yaml_upload": is_camel_yaml
         }
 
     def render_template(

@@ -132,7 +132,7 @@ Deploy Prometheus and Grafana to Kubernetes with HTTPS ingress:
 cd infrastructure/kubernetes/monitoring
 
 # 1. Get EC2 private IP for backend scraping
-ssh -i ~/.ssh/idp-demo-key-new.pem ec2-user@13.42.36.97 "hostname -I | awk '{print \$1}'"
+ssh -i ~/.ssh/idp-demo-key-new.pem ec2-user@51.24.49.197 "hostname -I | awk '{print \$1}'"
 
 # 2. Update prometheus/configmap.yaml with EC2 IP
 # Replace <EC2_PRIVATE_IP> with actual private IP

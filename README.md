@@ -1,199 +1,350 @@
-# Internal Developer Platform (IDP) MVP
+# Internal Developer Platform (IDP)
 
-A lightweight Internal Developer Platform that automates the creation of microservices with full CI/CD and monitoring capabilities.
+A cloud-hosted Internal Developer Platform that automates the creation and deployment of microservices with full CI/CD, monitoring, and analytics capabilities.
+
+🌐 **Live Platform**: [https://kris-idp.org](https://kris-idp.org)
 
 ## Overview
 
-This IDP provides a web portal where developers can create new microservices with a single click. The platform automatically:
-- Generates project code from templates
-- Creates GitHub repository with CI/CD pipeline
-- Builds and pushes Docker images
-- Deploys to Kubernetes using ArgoCD
-- Sets up monitoring (Dynatrace or Prometheus)
+The IDP provides a web portal where developers can create production-ready microservices with a single click. The platform automatically:
+
+- ✅ Generates project code from templates (including OpenAPI specifications)
+- ✅ Creates GitHub repository with CI/CD pipeline
+- ✅ Builds and publishes Docker images to GitHub Container Registry
+- ✅ Deploys to Kubernetes (k3s) using ArgoCD
+- ✅ Sets up Prometheus metrics and Grafana dashboards
+- ✅ Provides HTTPS access with automatic SSL certificates
+- ✅ Tracks analytics and platform metrics
 
 ## Architecture
 
+### Cloud Infrastructure
+
+The platform runs on a **dual-EC2 architecture** on AWS:
+
 ```
-Developer → React Portal → FastAPI Backend → GitHub API
-                                ↓
-                    Creates: Repo + GH Actions + Helm Chart
-                                ↓
-                    GitHub Actions builds Docker image
-                                ↓
-                    ArgoCD syncs to local Kubernetes
-                                ↓
-                    Dynatrace monitors automatically
+┌─────────────────────────────────────────────────────────────────┐
+│                          AWS Cloud                              │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│  EC2 Instance #1 (13.42.53.7)                                  │
+│  ┌──────────────────────────────────────────────────────────┐  │
+│  │ 🌐 kris-idp.org (HTTPS)                                  │  │
+│  │                                                           │  │
+│  │  ┌─────────────┐  ┌─────────────┐                       │  │
+│  │  │   Frontend  │  │   Backend   │                       │  │
+│  │  │   (React)   │  │  (FastAPI)  │                       │  │
+│  │  │   + Nginx   │  │  + SQLite   │                       │  │
+│  │  └─────────────┘  └─────────────┘                       │  │
+│  │                                                           │  │
+│  │  Private IP: 172.31.46.112                                │  │
+│  └──────────────────────────────────────────────────────────┘  │
+│                          │                                      │
+│                          │ ArgoCD API + Metrics                 │
+│                          ↓                                      │
+│  EC2 Instance #2 (18.133.74.27)                              │
+│  ┌──────────────────────────────────────────────────────────┐  │
+│  │ ☸️  k3s Kubernetes Cluster                               │  │
+│  │                                                           │  │
+│  │  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐     │  │
+│  │  │   ArgoCD    │  │ Prometheus  │  │   Grafana   │     │  │
+│  │  │  (GitOps)   │  │ (Metrics)   │  │ (Dashboards)│     │  │
+│  │  └─────────────┘  └─────────────┘  └─────────────┘     │  │
+│  │                                                           │  │
+│  │  ┌─────────────────────────────────────────────────────┐ │  │
+│  │  │   Deployed Microservices (User Projects)           │ │  │
+│  │  │   • krisacc-svc-1, krisacc-svc-2, ...             │ │  │
+│  │  │   • Each with: Deployment, Service, Ingress        │ │  │
+│  │  └─────────────────────────────────────────────────────┘ │  │
+│  │                                                           │  │
+│  │  Private IP: 172.31.2.204                                │  │
+│  └──────────────────────────────────────────────────────────┘  │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
 ```
+
+### Deployment Flow
+
+```
+Developer → https://kris-idp.org
+              ↓
+         React Frontend
+              ↓
+         FastAPI Backend
+              ↓
+    ┌─────────┴──────────┐
+    ↓                    ↓
+GitHub API          ArgoCD API (EC2 #2)
+    ↓                    ↓
+Creates Repo        Creates Application
++ Helm Chart             ↓
+    ↓              Syncs to k3s Cluster
+GitHub Actions           ↓
+    ↓              Deployment + Service + Ingress
+Builds Docker            ↓
+    ↓              https://kris-idp.org/PROJECT-NAME/*
+Pushes to GHCR
+```
+
+### Key Access Points
+
+| Service | URL | Description |
+|---------|-----|-------------|
+| **IDP Platform** | https://kris-idp.org | Main web portal |
+| **Prometheus** | https://prometheus-idp.duckdns.org | Metrics collection |
+| **Grafana** | https://grafana-idp.duckdns.org | Monitoring dashboards |
+| **Deployed Services** | https://kris-idp.org/`{project-name}`/* | Your microservices |
+
+## Features
+
+### 🎯 Core Capabilities
+
+- **Multi-Template Support**: Python FastAPI, Node.js Express, OpenAPI-generated, Apache Camel YAML DSL
+- **OpenAPI Code Generation**: Upload OpenAPI 3.x spec → Get typed FastAPI service
+- **One-Click Deployment**: From form submission to live service in 2-5 minutes
+- **GitOps Workflow**: GitHub + GitHub Actions + ArgoCD + k3s
+- **Built-in Monitoring**: Prometheus metrics + Grafana dashboards
+- **HTTPS by Default**: Automatic SSL via NGINX reverse proxy
+- **User Authentication**: JWT-based auth with password reset
+- **Analytics Dashboard**: Track project creation, deployments, and platform usage
+
+### 📦 Available Templates
+
+#### 1. Python Microservice
+- **Framework**: FastAPI 0.109.0
+- **Features**:
+  - Async request handlers
+  - Pydantic v2 validation
+  - Pytest test suite
+  - Health check endpoint
+  - Prometheus metrics instrumentation
+  - OpenAPI documentation auto-generated
+- **Default Port**: 8000
+
+#### 2. Node.js API
+- **Framework**: Express.js 4.18.2
+- **Features**:
+  - RESTful API structure
+  - Jest test suite
+  - Health check endpoint
+  - Prometheus metrics (prom-client)
+  - Error handling middleware
+- **Default Port**: 3000
+
+#### 3. OpenAPI Microservice ⭐ NEW
+- **Framework**: FastAPI (auto-generated)
+- **Features**:
+  - Upload OpenAPI 3.x specification (.yaml/.json)
+  - Automatic code generation:
+    - Pydantic models from schemas
+    - Route handlers with type hints
+    - Request/response validation
+    - TODO comments for implementation
+  - Full deployment pipeline included
+  - Preserves original spec in repo
+- **Default Port**: 8000
+
+#### 4. Apache Camel YAML DSL ⭐ NEW
+- **Framework**: Apache Camel on Quarkus 3.17.5
+- **Features**:
+  - Upload your own Camel YAML routes file
+  - Drag-and-drop file upload with validation
+  - Supports REST DSL, HTTP, Timer, Direct, and more
+  - Quarkus runtime with Java 17
+  - Health checks at `/q/health`
+  - Prometheus metrics at `/q/metrics`
+  - WireMock integration for mock backends
+- **Default Port**: 8080
+- **Supported Camel Components**: platform-http, rest, jackson, bean, http, timer, log, direct, microprofile-health
+
+### 🔐 Security
+
+- **Authentication**: JWT tokens with 30-minute expiry
+- **HTTPS Everywhere**: All traffic encrypted via Let's Encrypt
+- **Secret Management**: GitHub tokens stored securely in backend env
+- **Redaction**: Sensitive data redacted in logs and responses
+- **CORS**: Configured for production domain only
+
+### 📊 Monitoring & Observability
+
+**Prometheus Metrics** (Auto-collected from all services):
+- HTTP request rate and latency
+- Response status codes (2xx, 4xx, 5xx)
+- Background task execution
+- External API performance (GitHub, ArgoCD)
+- Custom metrics from deployed services
+
+**Grafana Dashboards**:
+- **IDP Platform Metrics**: Platform health and performance
+- **Project Analytics**: Creation success/failure rates
+- **Service Metrics**: Individual microservice monitoring
+
+**Access Monitoring**:
+- Prometheus: https://prometheus-idp.duckdns.org
+- Grafana: https://grafana-idp.duckdns.org
+  - Username: `admin`
+  - Password: See `MONITORING_ACCESS_GUIDE.md`
 
 ## Tech Stack
 
-- **Frontend**: React + Vite + TypeScript + Tailwind CSS
-- **Backend**: Python 3.11+ FastAPI + SQLAlchemy + Pydantic
-- **Database**: SQLite
+### Frontend
+- **Framework**: React 18 + TypeScript
+- **Build Tool**: Vite
+- **Styling**: Tailwind CSS
+- **HTTP Client**: Axios
+- **Routing**: React Router v6
+- **State Management**: React Context API
+- **Deployment**: NGINX (Docker)
+
+### Backend
+- **Framework**: FastAPI 0.109.0
+- **Language**: Python 3.11
+- **Database**: SQLAlchemy + SQLite (production), Alembic migrations
+- **Authentication**: JWT tokens (python-jose)
+- **Validation**: Pydantic v2
 - **Templating**: Cookiecutter
 - **Git Integration**: PyGithub
-- **Container Orchestration**: kind (Kubernetes in Docker)
-- **GitOps**: ArgoCD
-- **Monitoring**: Dynatrace OneAgent or Prometheus/Grafana
+- **Code Generation**: datamodel-code-generator, openapi-spec-validator
+- **Metrics**: Prometheus (prometheus-fastapi-instrumentator)
+- **Deployment**: Docker (FastAPI + Uvicorn)
 
-## Prerequisites
+### Infrastructure
+- **Container Orchestration**: k3s (lightweight Kubernetes)
+- **GitOps**: ArgoCD 2.x
+- **Container Registry**: GitHub Container Registry (GHCR)
+- **CI/CD**: GitHub Actions
+- **Reverse Proxy**: NGINX with SSL termination
+- **Certificates**: Let's Encrypt (manual setup)
+- **DNS**: DuckDNS for monitoring subdomains
+- **Cloud Provider**: AWS EC2 (Ubuntu 22.04, Amazon Linux 2023)
 
-Before starting, ensure you have the following installed:
+### Package Managers
+- **Helm**: v3 (Kubernetes deployments)
+- **Python**: pip + venv
+- **Node.js**: npm
 
-- **Docker Desktop** (v20.10+)
-- **kubectl** (v1.25+)
-- **kind** (v0.20+)
-- **Node.js** (v18+)
-- **Python** (v3.11+)
-- **GitHub Personal Access Token** with repo and packages permissions
+## Getting Started (For Users)
 
-### Installing Prerequisites
+### Access the Platform
 
-**macOS:**
-```bash
-brew install docker kubectl kind node python@3.11
-```
+1. Visit **https://kris-idp.org**
+2. Click "Login" or "Sign Up"
+3. Create an account or use demo credentials (if available)
 
-**Linux:**
-```bash
-# Docker
-curl -fsSL https://get.docker.com -o get-docker.sh
-sh get-docker.sh
+### Create Your First Microservice
 
-# kubectl
-curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
-chmod +x kubectl && sudo mv kubectl /usr/local/bin/
+#### Option 1: Use a Built-in Template
 
-# kind
-curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.20.0/kind-linux-amd64
-chmod +x ./kind && sudo mv ./kind /usr/local/bin/kind
-
-# Node.js
-curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
-sudo apt-get install -y nodejs
-
-# Python 3.11
-sudo apt-get install python3.11 python3.11-venv python3-pip
-```
-
-## Quick Start
-
-### 1. Clone the Repository
-
-```bash
-cd /Users/krishansingh/Documents/claude_ai/idp
-```
-
-### 2. Set Up Infrastructure
-
-```bash
-# Create kind cluster and install ArgoCD
-bash infrastructure/setup-cluster.sh
-```
-
-This will:
-- Create a local Kubernetes cluster using kind
-- Install ingress controller
-- Install ArgoCD
-- Display ArgoCD admin password
-
-### 3. Configure Environment Variables
-
-**Backend (.env):**
-```bash
-cd backend
-cp .env.example .env
-```
-
-Edit `backend/.env` and set:
-```env
-GITHUB_TOKEN=ghp_your_github_personal_access_token
-GITHUB_ORG=your-github-username-or-org
-ARGOCD_PASSWORD=<password-from-setup-script>
-```
-
-**Frontend (.env):**
-```bash
-cd frontend
-cp .env.example .env
-# Default values should work for local development
-```
-
-### 4. Start ArgoCD Port Forward
-
-In a separate terminal:
-```bash
-kubectl port-forward svc/argocd-server -n argocd 8080:443
-```
-
-Keep this running. You can access ArgoCD UI at `https://localhost:8080`
-
-### 5. Start the Application
-
-```bash
-# From project root
-docker-compose up
-```
-
-This will start:
-- **Backend API** at http://localhost:8000
-- **Frontend UI** at http://localhost:5173
-
-### 6. Create Your First Project
-
-1. Open http://localhost:5173 in your browser
-2. Fill in the project creation form:
+1. Click **"Create New Project"**
+2. Select a template:
+   - **Python Microservice** for FastAPI services
+   - **Node.js API** for Express.js services
+3. Fill in the form:
    - **Project Name**: `my-first-service` (lowercase, hyphens allowed)
-   - **Description**: A test microservice
-   - **Template**: Select "Python Microservice" or "Node.js API"
-3. Click "Create Project"
-4. Watch the status change from "pending" → "creating_repo" → "building" → "deploying" → "active"
+   - **Description**: Brief description of your service
+   - **Port**: Default is fine (8000 for Python, 3000 for Node.js)
+   - **Author**: Your name
+   - **GitHub Org**: Your GitHub username or organization
+4. Click **"Create Project"**
+5. Watch the status: `pending` → `creating_repo` → `building` → `deploying` → `active`
 
-### 7. Verify Deployment
+#### Option 2: Deploy a Camel YAML Integration
 
-**Check GitHub:**
-```bash
-# Repository should be created
-open https://github.com/YOUR_ORG/my-first-service
+1. Click **"Create New Project"**
+2. Select **"Apache Camel YAML DSL"** template
+3. **Upload your Camel YAML routes file**:
+   - Supported formats: `.yaml`, `.yml`
+   - Must contain Camel route definitions (`route`, `from`, or `rest` keys)
+   - Max file size: 1MB
+4. Fill in **Project Name** and **Description**
+5. Click **"Create Project"**
+6. Platform will:
+   - Validate your YAML routes
+   - Inject routes into the Quarkus/Camel project
+   - Build with Maven + Java 17
+   - Deploy to k3s cluster with correct health probes
 
-# GitHub Actions should be running
-gh run list --repo YOUR_ORG/my-first-service
+#### Option 3: Generate from OpenAPI Specification
+
+1. Click **"Create New Project"**
+2. Select **"OpenAPI Microservice"** template
+3. Fill in the form and **upload your OpenAPI spec file**:
+   - Supported formats: `.yaml`, `.yml`, `.json`
+   - Must be OpenAPI 3.x (Swagger 2.0 not supported)
+   - Max file size: 1MB
+4. Click **"Create Project"**
+5. Platform will:
+   - Validate your spec
+   - Generate Pydantic models from schemas
+   - Generate typed route handlers
+   - Create full deployment pipeline
+   - Deploy to k3s cluster
+
+### Access Your Service
+
+Once status is **"active"**, your service is live at:
+
+```
+https://kris-idp.org/{project-name}/*
 ```
 
-**Check ArgoCD:**
-```bash
-kubectl get applications -n argocd
-# Should show your new application
+**Example endpoints:**
+- Health check: `https://kris-idp.org/my-first-service/health`
+- API docs: `https://kris-idp.org/my-first-service/docs` (FastAPI services)
+- Metrics: `https://kris-idp.org/my-first-service/metrics`
 
-# Or view in UI
-open https://localhost:8080
+### Monitor Your Service
+
+Query your service in **Prometheus**:
+
+```promql
+# Check if service is up
+up{service="my-first-service"}
+
+# HTTP request rate
+rate(http_requests_total{service="my-first-service"}[5m])
+
+# 95th percentile latency
+histogram_quantile(0.95, rate(http_request_duration_seconds_bucket{service="my-first-service"}[5m]))
 ```
 
-**Check Kubernetes:**
-```bash
-kubectl get pods
-kubectl get services
+View dashboards in **Grafana**:
+1. Visit https://grafana-idp.duckdns.org
+2. Login with provided credentials
+3. Go to **Dashboards** → **IDP Platform Metrics**
 
-# Access the service
-kubectl port-forward svc/my-first-service 8000:80
-curl http://localhost:8000/health
-```
+## Development Setup (For Contributors)
 
-## Development
+### Prerequisites
 
-### Backend Development
+- Docker & Docker Compose
+- Python 3.11+
+- Node.js 18+
+- kubectl (for k3s access)
+- SSH key for EC2 instances
+
+### Local Development
+
+#### Backend
 
 ```bash
 cd backend
 
 # Create virtual environment
 python3 -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+source venv/bin/activate
 
 # Install dependencies
 pip install -r requirements.txt
 
-# Run backend
+# Set up environment variables
+cp .env.example .env
+# Edit .env with your GitHub token and settings
+
+# Run database migrations
+alembic upgrade head
+
+# Start backend
 uvicorn app.main:app --reload --port 8000
 ```
 
@@ -201,7 +352,7 @@ uvicorn app.main:app --reload --port 8000
 - Swagger UI: http://localhost:8000/docs
 - ReDoc: http://localhost:8000/redoc
 
-### Frontend Development
+#### Frontend
 
 ```bash
 cd frontend
@@ -209,295 +360,590 @@ cd frontend
 # Install dependencies
 npm install
 
-# Run development server
+# Set up environment variables
+cp .env.example .env
+# Edit .env if needed (default values work for local dev)
+
+# Start dev server
 npm run dev
 ```
 
 Frontend will be available at http://localhost:5173
 
-### Running Tests
+#### Running Tests
 
 **Backend:**
 ```bash
 cd backend
 pytest tests/ -v
+
+# With coverage
+pytest tests/ -v --cov=app --cov-report=html
 ```
 
 **Frontend:**
 ```bash
 cd frontend
 npm test
+
+# Watch mode
+npm test -- --watch
+```
+
+### Docker Compose (Full Stack)
+
+```bash
+# Start both frontend and backend
+docker-compose up
+
+# Start in background
+docker-compose up -d
+
+# View logs
+docker-compose logs -f backend
+docker-compose logs -f frontend
+
+# Rebuild after changes
+docker-compose up --build
+
+# Stop
+docker-compose down
+```
+
+## Production Deployment
+
+**⚠️ For production deployment to EC2, see [DEPLOYMENT.md](./DEPLOYMENT.md)**
+
+### Quick Deployment Commands
+
+```bash
+# SSH to IDP Application server (EC2 #1)
+ssh -i ~/.ssh/idp-demo-key-new.pem ec2-user@13.42.53.7
+
+# Navigate to project
+cd /home/ec2-user/idp
+
+# Pull latest changes
+git pull origin main
+
+# Deploy both frontend and backend
+./deploy.sh both
+
+# Or deploy individually
+./deploy.sh backend  # Includes database migrations
+./deploy.sh frontend
+```
+
+**Production URL**: https://kris-idp.org
+
+### Monitoring Production
+
+```bash
+# SSH to k3s cluster (EC2 #2)
+ssh -i ~/.ssh/idp-demo-key-new.pem ec2-user@18.133.74.27
+
+# Check deployed projects
+kubectl get pods,svc,ingress
+
+# Check ArgoCD applications
+kubectl get applications -n argocd
+
+# Check monitoring stack
+kubectl get pods -n monitoring
+
+# View logs
+kubectl logs -l app={project-name}
 ```
 
 ## Project Structure
 
 ```
 idp/
-├── backend/              # FastAPI backend
+├── backend/                    # FastAPI backend application
 │   ├── app/
-│   │   ├── api/          # API endpoints
-│   │   ├── core/         # Configuration and database
-│   │   ├── models/       # SQLAlchemy models
-│   │   ├── schemas/      # Pydantic schemas
-│   │   ├── services/     # Business logic
-│   │   └── templates/    # Cookiecutter templates
-│   ├── tests/
-│   └── requirements.txt
-├── frontend/             # React frontend
+│   │   ├── api/v1/            # API endpoints
+│   │   │   ├── projects.py    # Project CRUD + workflow
+│   │   │   ├── templates.py   # Template listing
+│   │   │   ├── auth.py        # JWT authentication
+│   │   │   ├── analytics.py   # Platform analytics
+│   │   │   └── health.py      # Health checks
+│   │   ├── core/              # Core configuration
+│   │   │   ├── config.py      # Settings management
+│   │   │   ├── database.py    # SQLAlchemy setup
+│   │   │   ├── security.py    # JWT & password hashing
+│   │   │   ├── secrets.py     # Secret management
+│   │   │   ├── logging.py     # Structured logging
+│   │   │   ├── metrics.py     # Prometheus metrics
+│   │   │   └── redaction.py   # Sensitive data redaction
+│   │   ├── models/            # SQLAlchemy models
+│   │   │   ├── project.py     # Project model
+│   │   │   └── user.py        # User model
+│   │   ├── schemas/           # Pydantic schemas
+│   │   │   ├── project.py     # Project DTOs
+│   │   │   ├── user.py        # User DTOs
+│   │   │   └── analytics.py   # Analytics DTOs
+│   │   ├── services/          # Business logic services
+│   │   │   ├── template_engine.py        # Cookiecutter rendering
+│   │   │   ├── github_service.py         # GitHub API integration
+│   │   │   ├── argocd_service.py         # ArgoCD API integration
+│   │   │   ├── openapi_generator_service.py  # OAS code generation
+│   │   │   └── analytics_service.py      # Analytics aggregation
+│   │   ├── templates/         # Cookiecutter templates
+│   │   │   ├── python-microservice/
+│   │   │   ├── nodejs-api/
+│   │   │   ├── openapi-microservice/
+│   │   │   └── camel-yaml-api/
+│   │   ├── middleware/        # FastAPI middleware
+│   │   │   ├── cors.py        # CORS configuration
+│   │   │   └── logging.py     # Request logging
+│   │   └── main.py            # FastAPI app entry point
+│   ├── alembic/               # Database migrations
+│   │   ├── versions/          # Migration scripts
+│   │   └── env.py
+│   ├── tests/                 # Backend tests
+│   │   ├── fixtures/          # Test fixtures (OAS files, etc.)
+│   │   └── test_*.py
+│   ├── scripts/               # Utility scripts
+│   ├── requirements.txt       # Python dependencies
+│   ├── Dockerfile             # Backend container
+│   └── .env.example           # Environment template
+├── frontend/                  # React frontend application
 │   ├── src/
-│   │   ├── components/   # React components
-│   │   ├── services/     # API client
-│   │   └── types/        # TypeScript types
-│   └── package.json
-├── infrastructure/       # K8s and ArgoCD setup
-│   ├── kind-config.yaml
-│   ├── setup-cluster.sh
-│   └── argocd/
-└── docker-compose.yml    # Local development
-```
-
-## Available Templates
-
-### Python Microservice
-- FastAPI application
-- Health check endpoint
-- Pytest test suite
-- Multi-stage Dockerfile
-- GitHub Actions CI/CD
-- Helm chart for K8s deployment
-
-### Node.js API
-- Express.js application
-- Health check endpoint
-- Jest test suite
-- Multi-stage Dockerfile
-- GitHub Actions CI/CD
-- Helm chart for K8s deployment
-
-## Adding Custom Templates
-
-1. Create a new directory in `backend/app/templates/`
-2. Add `cookiecutter.json` with template variables
-3. Create template structure under `{{cookiecutter.project_name}}/`
-4. Include: source code, Dockerfile, GitHub Actions workflow, Helm chart
-5. Restart backend to load the new template
-
-See existing templates for reference.
-
-## Observability
-
-The IDP platform includes comprehensive monitoring with Prometheus and Grafana deployed to Kubernetes with HTTPS access.
-
-### Access Monitoring Dashboards
-
-**Production Access (HTTPS):**
-- **Prometheus**: https://my-idp.duckdns.org/prometheus
-- **Grafana**: https://my-idp.duckdns.org/grafana
-  - Username: `admin`
-  - Password: (set in `infrastructure/kubernetes/monitoring/grafana/secret.yaml`)
-
-**Local Access (Port-Forward):**
-```bash
-# Prometheus
-kubectl port-forward -n monitoring svc/prometheus 9090:9090
-# Open http://localhost:9090
-
-# Grafana
-kubectl port-forward -n monitoring svc/grafana 3000:3000
-# Open http://localhost:3000
-```
-
-### Deploy Monitoring Stack
-
-The monitoring stack is deployed separately from the main application:
-
-```bash
-cd infrastructure/kubernetes/monitoring
-
-# Before deploying, configure:
-# 1. Get EC2 private IP for backend scraping
-ssh -i ~/.ssh/idp-demo-key-new.pem ec2-user@13.42.36.97 "hostname -I | awk '{print \$1}'"
-
-# 2. Update prometheus/configmap.yaml
-# Replace <EC2_PRIVATE_IP> with actual IP
-
-# 3. Set Grafana password in grafana/secret.yaml
-
-# Deploy the stack
-bash deploy.sh
-
-# Or manually apply
-kubectl apply -f namespace.yaml
-kubectl apply -f prometheus/
-kubectl apply -f grafana/
-```
-
-### What's Monitored
-
-**Backend Metrics** (IDP Platform):
-- HTTP request rate and latency (p50, p95)
-- Project creation success/failure counts
-- Background task activity
-- External API performance (GitHub, ArgoCD)
-
-**Deployed Services**:
-- Auto-discovered via Kubernetes service discovery
-- Services with `prometheus.io/scrape=true` annotation
-- Custom metrics from your microservices
-
-### Grafana Dashboards
-
-**Pre-configured Dashboards**:
-- **IDP Platform Metrics**: Overview of platform health and performance
-  - HTTP request metrics
-  - Project creation workflow
-  - External API latency
-  - Background task monitoring
-
-**Adding Custom Dashboards**:
-1. Create dashboard JSON file
-2. Add to `infrastructure/kubernetes/monitoring/grafana/` as ConfigMap
-3. Apply: `kubectl apply -f grafana/configmap-dashboard-custom.yaml`
-4. Restart Grafana: `kubectl rollout restart deployment/grafana -n monitoring`
-
-### Troubleshooting Monitoring
-
-**Prometheus not scraping backend:**
-```bash
-# Check Prometheus targets
-kubectl port-forward -n monitoring svc/prometheus 9090:9090
-# Visit http://localhost:9090/targets
-
-# Verify EC2 connectivity from Prometheus pod
-kubectl exec -n monitoring -it deployment/prometheus -- wget -O- http://<EC2_IP>:8000/metrics
-```
-
-**Grafana dashboard shows no data:**
-```bash
-# Check datasource connection
-kubectl logs -n monitoring -l app=grafana
-
-# Verify Prometheus is accessible
-kubectl exec -n monitoring -it deployment/grafana -- wget -O- http://prometheus.monitoring.svc.cluster.local:9090/-/healthy
-```
-
-**TLS certificate issues:**
-```bash
-# Check certificate status
-kubectl get certificate -n monitoring
-kubectl describe certificate my-idp-tls -n monitoring
-
-# Check cert-manager logs
-kubectl logs -n cert-manager deployment/cert-manager
-```
-
-### Alternative: Dynatrace (Production)
-
-For enterprise monitoring, see [infrastructure/dynatrace/setup.md](infrastructure/dynatrace/setup.md) for full Dynatrace integration.
-
-## Troubleshooting
-
-### Backend won't start
-- Check that PostgreSQL is running (or using SQLite)
-- Verify `.env` file exists with correct values
-- Check GitHub token has correct permissions
-
-### Frontend can't connect to backend
-- Ensure backend is running on port 8000
-- Check CORS origins in backend configuration
-- Verify `VITE_API_URL` in frontend `.env`
-
-### ArgoCD can't sync
-- Check ArgoCD credentials in backend `.env`
-- Verify repository exists and is accessible
-- Check ArgoCD Application resource: `kubectl get applications -n argocd`
-
-### GitHub Actions failing
-- Verify GITHUB_TOKEN has packages:write permission
-- Check workflow logs in GitHub UI
-- Ensure Dockerfile builds locally: `docker build -t test .`
-
-### Kind cluster issues
-```bash
-# Delete and recreate cluster
-kind delete cluster --name idp-cluster
-bash infrastructure/setup-cluster.sh
+│   │   ├── components/        # React components
+│   │   │   ├── ProjectForm.tsx       # Create project form
+│   │   │   ├── ProjectList.tsx       # Project listing
+│   │   │   ├── TemplateSelector.tsx  # Template chooser
+│   │   │   ├── OpenAPIUpload.tsx     # OpenAPI file upload
+│   │   │   ├── CamelYAMLUpload.tsx  # Camel YAML routes upload
+│   │   │   ├── Login.tsx             # Login form
+│   │   │   ├── PasswordReset.tsx     # Password reset
+│   │   │   └── StatsCard.tsx         # Analytics cards
+│   │   ├── contexts/          # React contexts
+│   │   │   └── AuthContext.tsx       # Auth state
+│   │   ├── pages/             # Page components
+│   │   │   ├── Dashboard.tsx
+│   │   │   ├── LoginPage.tsx
+│   │   │   └── AnalyticsPage.tsx
+│   │   ├── services/          # API clients
+│   │   │   └── api.ts         # Axios client + endpoints
+│   │   ├── types/             # TypeScript types
+│   │   │   ├── project.ts
+│   │   │   ├── user.ts
+│   │   │   └── analytics.ts
+│   │   ├── App.tsx            # Main app component
+│   │   ├── main.tsx           # React entry point
+│   │   └── index.css          # Global styles
+│   ├── public/                # Static assets
+│   ├── package.json           # Node dependencies
+│   ├── vite.config.ts         # Vite configuration
+│   ├── tsconfig.json          # TypeScript config
+│   └── Dockerfile             # Frontend container (NGINX)
+├── infrastructure/            # Kubernetes & monitoring setup
+│   ├── kubernetes/
+│   │   └── monitoring/        # Prometheus + Grafana
+│   │       ├── namespace.yaml
+│   │       ├── prometheus/
+│   │       │   ├── deployment.yaml
+│   │       │   ├── configmap.yaml     # Scrape configs
+│   │       │   ├── service.yaml
+│   │       │   └── ingress.yaml
+│   │       ├── grafana/
+│   │       │   ├── deployment.yaml
+│   │       │   ├── configmap-dashboard-idp.yaml
+│   │       │   ├── secret.yaml        # Grafana password
+│   │       │   ├── service.yaml
+│   │       │   └── ingress.yaml
+│   │       └── deploy.sh              # Deployment script
+│   └── grafana/               # Grafana dashboard JSONs
+│       └── idp-platform-metrics.json
+├── nginx-ssl.conf             # NGINX reverse proxy config
+├── docker-compose.yml         # Local development stack
+├── deploy.sh                  # Production deployment script
+├── .env.example               # Root environment template
+├── DEPLOYMENT.md              # Deployment guide
+├── MONITORING_ACCESS_GUIDE.md # Monitoring access guide
+├── CHECKPOINT_v1.2.md         # Version checkpoint
+├── SECURITY.md                # Security documentation
+└── README.md                  # This file
 ```
 
 ## API Reference
 
+### Authentication
+
+**Register**
+```http
+POST /api/v1/auth/register
+Content-Type: application/json
+
+{
+  "email": "user@example.com",
+  "username": "johndoe",
+  "password": "SecurePass123!",
+  "full_name": "John Doe"
+}
+```
+
+**Login**
+```http
+POST /api/v1/auth/login
+Content-Type: application/x-www-form-urlencoded
+
+username=johndoe&password=SecurePass123!
+```
+
+**Response:**
+```json
+{
+  "access_token": "eyJhbGciOiJIUzI1NiIs...",
+  "token_type": "bearer"
+}
+```
+
 ### Projects
 
-**Create Project**
-```
+**Create Project (Standard Template)**
+```http
 POST /api/v1/projects
+Authorization: Bearer {token}
+Content-Type: application/json
+
 {
   "name": "my-service",
   "description": "My new service",
   "template_type": "python-microservice",
-  "variables": {}
+  "variables": {
+    "port": "8000",
+    "author": "John Doe",
+    "github_org": "my-org"
+  }
 }
 ```
 
-**List Projects**
+**Create Project (OpenAPI Template)**
+```http
+POST /api/v1/projects/from-openapi
+Authorization: Bearer {token}
+Content-Type: multipart/form-data
+
+name=my-api-service
+description=API from OpenAPI spec
+port=8000
+openapi_file=@petstore.yaml
 ```
+
+**Create Project (Camel YAML Template)**
+```http
+POST /api/v1/projects/from-camel-yaml
+Authorization: Bearer {token}
+Content-Type: multipart/form-data
+
+name=my-camel-service
+description=Camel integration service
+camel_yaml_file=@routes.yaml
+```
+
+**List Projects**
+```http
 GET /api/v1/projects
+Authorization: Bearer {token}
 ```
 
 **Get Project**
-```
+```http
 GET /api/v1/projects/{project_id}
+Authorization: Bearer {token}
+```
+
+**Delete Project**
+```http
+DELETE /api/v1/projects/{project_id}
+Authorization: Bearer {token}
 ```
 
 ### Templates
 
 **List Templates**
-```
+```http
 GET /api/v1/templates
+Authorization: Bearer {token}
 ```
 
-**Get Template**
+**Response:**
+```json
+[
+  {
+    "name": "python-microservice",
+    "display_name": "Python Microservice",
+    "description": "FastAPI microservice template",
+    "variables": [
+      {
+        "name": "port",
+        "default": "8000",
+        "description": "Port"
+      }
+    ],
+    "requires_openapi_upload": false
+  }
+]
 ```
-GET /api/v1/templates/{template_name}
+
+### Analytics
+
+**Get Platform Statistics**
+```http
+GET /api/v1/analytics/stats
+Authorization: Bearer {token}
 ```
 
-## Cleanup
-
-```bash
-# Stop docker-compose
-docker-compose down
-
-# Delete kind cluster
-kind delete cluster --name idp-cluster
-
-# Remove local database
-rm backend/idp.db
+**Get Time Series Data**
+```http
+GET /api/v1/analytics/timeseries?period=7d
+Authorization: Bearer {token}
 ```
 
-## Next Steps
+## Configuration
 
-- Add authentication (GitHub OAuth)
-- Support multiple Kubernetes clusters
-- Add template marketplace
-- Implement webhook for build status updates
-- Add resource quotas and cost tracking
-- Support custom domains with cert-manager
-- Add rollback capabilities
+### Backend Environment Variables
+
+```env
+# GitHub Integration
+GITHUB_TOKEN=ghp_your_personal_access_token
+GITHUB_ORG=your-github-username-or-org
+
+# ArgoCD Integration
+ARGOCD_URL=http://172.31.2.204:80  # k3s cluster private IP
+ARGOCD_USERNAME=admin
+ARGOCD_PASSWORD=your-argocd-password
+
+# Authentication
+SECRET_KEY=your-secret-key-for-jwt-signing
+ACCESS_TOKEN_EXPIRE_MINUTES=30
+
+# Database
+DATABASE_URL=sqlite:///./idp.db
+
+# CORS
+CORS_ORIGINS=https://kris-idp.org
+
+# Logging
+LOG_LEVEL=INFO
+```
+
+### Frontend Environment Variables
+
+```env
+# Backend API
+VITE_API_URL=https://kris-idp.org/api
+
+# Optional: Analytics
+VITE_ANALYTICS_ENABLED=true
+```
+
+### NGINX Configuration
+
+See `nginx-ssl.conf` for full reverse proxy configuration:
+- SSL termination with Let's Encrypt certificates
+- Frontend serving from `/usr/share/nginx/html`
+- Backend API proxy to `/api/*`
+- Service proxy to deployed microservices
+- Monitoring proxy to `/prometheus` and `/grafana` (disabled by default)
+
+## Troubleshooting
+
+### Common Issues
+
+#### "Cannot connect to backend"
+- **Cause**: Backend not running or CORS misconfigured
+- **Solution**:
+  ```bash
+  docker logs idp-backend
+  # Check CORS_ORIGINS in .env
+  ```
+
+#### "GitHub repository creation failed"
+- **Cause**: Invalid GitHub token or insufficient permissions
+- **Solution**:
+  - Verify token has `repo` and `packages:write` scopes
+  - Check token hasn't expired
+  - Test: `gh auth status`
+
+#### "ArgoCD sync failed"
+- **Cause**: ArgoCD unreachable or credentials wrong
+- **Solution**:
+  ```bash
+  ssh -i ~/.ssh/idp-demo-key-new.pem ec2-user@18.133.74.27
+  kubectl get applications -n argocd
+  kubectl logs -n argocd -l app.kubernetes.io/name=argocd-server
+  ```
+
+#### "Service not accessible at kris-idp.org"
+- **Cause**: Ingress misconfigured or NGINX not routing
+- **Solution**:
+  ```bash
+  # Check ingress
+  kubectl get ingress
+  kubectl describe ingress {project-name}
+
+  # Check NGINX config
+  docker exec idp-frontend nginx -t
+  docker exec idp-frontend cat /etc/nginx/conf.d/default.conf
+  ```
+
+#### "OpenAPI generation failed"
+- **Cause**: Invalid spec or unsupported OpenAPI version
+- **Solution**:
+  - Ensure spec is OpenAPI 3.x (not Swagger 2.0)
+  - Validate spec: https://editor.swagger.io
+  - Check backend logs: `docker logs idp-backend | grep -i openapi`
+
+#### "Camel YAML service not starting"
+- **Cause**: Missing Camel dependencies for routes used or Java build failure
+- **Solution**:
+  - Check GitHub Actions build logs for Maven errors
+  - Ensure routes only use supported components (rest, http, timer, direct, log, bean, jackson)
+  - Quarkus health is at `/q/health` (not `/health`)
+  - Java services need ~60s to start — check pod events: `kubectl describe pod -l app={service-name}`
+
+#### "Prometheus not scraping my service"
+- **Cause**: Missing Prometheus annotations
+- **Solution**:
+  ```bash
+  # Check pod annotations
+  kubectl get pods -l app={service-name} -o yaml | grep prometheus
+
+  # Should see:
+  # prometheus.io/scrape: "true"
+  # prometheus.io/port: "8000"
+  # prometheus.io/path: "/metrics"
+  ```
+
+### Getting Help
+
+1. **Check Logs**:
+   ```bash
+   # Backend
+   docker logs idp-backend --tail 100 -f
+
+   # Frontend
+   docker logs idp-frontend --tail 100 -f
+
+   # Deployed service
+   kubectl logs -l app={service-name}
+   ```
+
+2. **Check Status**:
+   ```bash
+   # IDP containers
+   docker ps
+
+   # Kubernetes resources
+   kubectl get all
+   kubectl get applications -n argocd
+   ```
+
+3. **Review Documentation**:
+   - `DEPLOYMENT.md` - Production deployment guide
+   - `MONITORING_ACCESS_GUIDE.md` - Monitoring setup
+   - `CHECKPOINT_v1.2.md` - Current feature set
+   - `SECURITY.md` - Security guidelines
+
+## Version History
+
+### v1.3 - Camel YAML DSL Support (2026-03-25)
+- ✅ Apache Camel YAML DSL template with Quarkus runtime
+- ✅ Drag-and-drop YAML routes file upload with validation
+- ✅ WireMock integration for mock backends
+- ✅ Fixed health probe paths for Quarkus services (`/q/health`)
+- ✅ Updated EC2 IPs after Elastic IP removal
+- ✅ Cleaned up orphaned k8s resources
+
+### v1.2 - OpenAPI Feature Complete (2026-02-13)
+- ✅ OpenAPI microservice generation from spec files
+- ✅ UI redesign with template-first flow
+- ✅ Fixed duplicate field issues
+- ✅ Improved code generation (models + routes + tests)
+- ✅ Production deployment with HTTPS
+- ✅ Comprehensive monitoring setup
+
+### v1.1 - Initial OpenAPI Implementation
+- Initial OpenAPI template (had bugs)
+- Basic code generation
+
+### v1.0 - MVP Release
+- Python and Node.js templates
+- GitHub + ArgoCD integration
+- Basic monitoring
+
+## Roadmap
+
+### Planned Features
+
+- [ ] **Multi-Cluster Support**: Deploy to different environments (dev, staging, prod)
+- [ ] **Template Marketplace**: Browse and share community templates
+- [ ] **Cost Tracking**: Resource usage and cost estimation per project
+- [ ] **Rollback Mechanism**: One-click rollback to previous versions
+- [ ] **Webhook Integration**: Real-time build status updates from GitHub
+- [ ] **Custom Domains**: Automatic DNS + SSL for custom domains
+- [ ] **Team Management**: Organization-based access control
+- [ ] **Audit Logs**: Full audit trail of all platform actions
+- [ ] **Resource Quotas**: Limit CPU/memory per project
+- [ ] **Database Templates**: PostgreSQL, MongoDB, Redis templates
+- [ ] **Scheduled Scaling**: Auto-scaling based on time or metrics
+
+### Future Enhancements
+
+- Support for other languages (Go, Java, Rust)
+- Visual workflow builder (drag-and-drop)
+- Built-in API gateway
+- Service mesh integration (Istio, Linkerd)
+- Policy enforcement (OPA)
+- Secrets management (Vault integration)
 
 ## Contributing
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests
-5. Submit a pull request
+We welcome contributions! Here's how:
+
+1. **Fork the repository**
+2. **Create a feature branch**: `git checkout -b feature/amazing-feature`
+3. **Make your changes**
+4. **Add tests**: Ensure existing tests pass and add new ones
+5. **Commit your changes**: `git commit -m 'Add amazing feature'`
+6. **Push to branch**: `git push origin feature/amazing-feature`
+7. **Open a Pull Request**
+
+### Development Guidelines
+
+- Follow existing code style (Black for Python, Prettier for TypeScript)
+- Write tests for new features
+- Update documentation (README, DEPLOYMENT, etc.)
+- Keep commits atomic and well-described
+- Ensure all tests pass: `pytest` (backend), `npm test` (frontend)
 
 ## License
 
-MIT License - see LICENSE file for details
+MIT License - see [LICENSE](LICENSE) file for details.
 
 ## Support
 
-For issues and questions:
-- GitHub Issues: https://github.com/YOUR_ORG/idp/issues
-- Documentation: See docs/ directory
+For questions, issues, or feature requests:
+
+- 📧 **Email**: (your email)
+- 🐛 **Issues**: [GitHub Issues](https://github.com/singh-krishan/idp/issues)
+- 📖 **Documentation**: See `docs/` directory
+- 🌐 **Live Demo**: https://kris-idp.org
+
+## Acknowledgments
+
+- **FastAPI** - High-performance Python web framework
+- **React** - UI library
+- **ArgoCD** - GitOps continuous delivery
+- **Prometheus & Grafana** - Monitoring and observability
+- **Cookiecutter** - Project templating
+- **k3s** - Lightweight Kubernetes
+
+---
+
+**Built with ❤️ by Krishan Singh**
+
+**Live Platform**: [https://kris-idp.org](https://kris-idp.org)

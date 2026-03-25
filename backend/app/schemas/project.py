@@ -76,6 +76,7 @@ class TemplateInfo(BaseModel):
     description: str
     variables: list[dict]  # List of {name, description, default, type}
     requires_openapi_upload: bool = False
+    requires_camel_yaml_upload: bool = False
 
 
 class ProjectListResponse(BaseModel):

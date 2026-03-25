@@ -25,6 +25,7 @@ export interface Template {
   description: string;
   variables: TemplateVariable[];
   requires_openapi_upload: boolean;
+  requires_camel_yaml_upload: boolean;
 }
 
 export interface TemplateVariable {

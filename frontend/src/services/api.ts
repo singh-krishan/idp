@@ -65,6 +65,26 @@ export const projectsApi = {
     return response.data;
   },
 
+  async createProjectFromCamelYAML(data: {
+    name: string;
+    description?: string;
+    port?: string;
+    camel_yaml_file: File;
+  }): Promise<Project> {
+    const formData = new FormData();
+    formData.append('name', data.name);
+    formData.append('description', data.description || '');
+    formData.append('port', data.port || '8080');
+    formData.append('camel_yaml_file', data.camel_yaml_file);
+
+    const response = await api.post<Project>('/api/v1/projects/from-camel-yaml', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return response.data;
+  },
+
   async listProjects(params?: {
     search?: string;
     status?: string;

@@ -1,0 +1,9 @@
+{
+  "project_name": "my-camel-service",
+  "description": "An Apache Camel YAML DSL microservice",
+  "port": "8080",
+  "author": "IDP Platform",
+  "github_org": "your-github-org",
+  "_camel_yaml_template": true,
+  "_skip_variables": ["project_name", "description"]
+}

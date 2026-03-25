@@ -256,6 +256,119 @@ async def create_openapi_project_workflow(
         background_tasks_active.dec()
 
 
+async def create_camel_yaml_project_workflow(
+    project_id: str,
+    project_name: str,
+    description: str,
+    routes_content: str,
+    port: str,
+    db: Session
+):
+    """
+    Background task for Camel YAML-based project creation workflow.
+
+    Args:
+        project_id: Database project ID.
+        project_name: Name of the project.
+        description: Project description.
+        routes_content: Camel YAML DSL routes content.
+        port: Application port.
+        db: Database session.
+    """
+    background_tasks_active.inc()
+    project = db.query(Project).filter(Project.id == project_id).first()
+
+    try:
+        project.status = "creating_repo"
+        db.commit()
+
+        logger.info(f"Starting Camel YAML project creation: {project_name}")
+
+        # Step 1: Render Cookiecutter template (infrastructure files)
+        logger.info(f"Rendering camel-yaml-api template")
+        rendered_path = template_engine.render_template(
+            template_name="camel-yaml-api",
+            project_name=project_name,
+            variables={
+                "description": description,
+                "port": port
+            }
+        )
+
+        # Step 2: Inject uploaded routes.yaml into the rendered project
+        import os
+        routes_file = os.path.join(rendered_path, "src", "main", "resources", "camel", "routes.yaml")
+        os.makedirs(os.path.dirname(routes_file), exist_ok=True)
+        with open(routes_file, 'w') as f:
+            f.write(routes_content)
+        logger.info(f"Injected Camel YAML routes into project")
+
+        # Step 3: Create GitHub repository
+        logger.info(f"Creating GitHub repository: {project_name}")
+        repo_url, clone_url = github_service.create_repository(
+            repo_name=project_name,
+            description=description,
+            private=False
+        )
+
+        project.github_repo_url = repo_url
+        project.github_repo_name = project_name
+        db.commit()
+
+        # Step 4: Push files to GitHub
+        logger.info(f"Pushing files to GitHub repository: {project_name}")
+        github_service.push_files(
+            repo_name=project_name,
+            project_path=rendered_path
+        )
+
+        # Cleanup rendered template
+        template_engine.cleanup_rendered_template(rendered_path)
+
+        # Update status: building
+        project.status = "building"
+        db.commit()
+
+        # Step 5: Create ArgoCD application
+        logger.info(f"Creating ArgoCD application: {project_name}")
+        try:
+            await argocd_service.create_application(
+                app_name=project_name,
+                repo_url=clone_url,
+                path="helm",
+                auto_sync=True
+            )
+
+            project.argocd_app_name = project_name
+            project.status = "deploying"
+            db.commit()
+
+            logger.info(f"ArgoCD application created: {project_name}")
+
+            # Mark as active
+            project.status = "active"
+            db.commit()
+
+        except Exception as e:
+            logger.warning(f"ArgoCD creation failed (may not be running): {e}")
+            project.status = "active"
+            project.error_message = f"ArgoCD integration failed: {str(e)}"
+            db.commit()
+
+        project_creation_total.labels(status="success", template_type="camel-yaml-api").inc()
+        logger.info(f"Camel YAML project creation completed: {project_name}")
+
+    except Exception as e:
+        logger.error(f"Camel YAML project creation failed: {e}")
+        project.status = "failed"
+        project.error_message = str(e)
+        db.commit()
+        project_creation_total.labels(status="failed", template_type="camel-yaml-api").inc()
+
+    finally:
+        background_tasks_active.dec()
+
+
 @router.post("", response_model=ProjectResponse, status_code=201)
 async def create_project(
     project_data: ProjectCreate,
@@ -422,6 +535,119 @@ async def create_project_from_openapi(
     )
 
     logger.info(f"Started OpenAPI project creation: {name_lower}")
+    return project
+
+
+@router.post("/from-camel-yaml", response_model=ProjectResponse, status_code=201)
+async def create_project_from_camel_yaml(
+    background_tasks: BackgroundTasks,
+    camel_yaml_file: UploadFile = File(..., description="Camel YAML DSL routes file (.yaml or .yml)"),
+    name: str = Form(..., min_length=1, max_length=255),
+    description: str = Form(default=""),
+    port: str = Form(default="8080"),
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Create a new project from an Apache Camel YAML DSL routes file.
+
+    Accepts multipart/form-data with the Camel routes YAML file and project metadata.
+    Generates a full Quarkus + Camel project with the uploaded routes injected.
+
+    Requires authentication.
+    """
+    # Validate file extension
+    filename = camel_yaml_file.filename or ""
+    if not filename.lower().endswith(('.yaml', '.yml')):
+        raise HTTPException(
+            status_code=400,
+            detail="File must be .yaml or .yml"
+        )
+
+    # Read and validate file size
+    content = await camel_yaml_file.read()
+    if len(content) > 1_048_576:  # 1MB limit
+        raise HTTPException(
+            status_code=400,
+            detail="File size must be under 1MB"
+        )
+
+    routes_content = content.decode('utf-8')
+
+    # Validate it's valid YAML with Camel route structure
+    import yaml
+    try:
+        parsed = yaml.safe_load(routes_content)
+        if not isinstance(parsed, list):
+            raise ValueError("Camel YAML routes must be a list of route definitions")
+        # Check that at least one entry looks like a Camel route
+        has_route = any(
+            isinstance(item, dict) and ('route' in item or 'from' in item or 'rest' in item)
+            for item in parsed
+        )
+        if not has_route:
+            raise ValueError(
+                "No valid Camel routes found. Each entry should contain 'route', 'from', or 'rest' key"
+            )
+    except yaml.YAMLError as e:
+        raise HTTPException(
+            status_code=422,
+            detail=f"Invalid YAML syntax: {str(e)}"
+        )
+    except ValueError as e:
+        raise HTTPException(
+            status_code=422,
+            detail=f"Invalid Camel YAML routes: {str(e)}"
+        )
+
+    # Validate project name
+    name_lower = name.lower()
+    if not name_lower.replace("-", "").replace("_", "").isalnum():
+        raise HTTPException(
+            status_code=400,
+            detail="Project name must contain only alphanumeric characters, hyphens, and underscores"
+        )
+
+    # Check if project already exists
+    existing = db.query(Project).filter(Project.name == name_lower).first()
+    if existing:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Project '{name_lower}' already exists"
+        )
+
+    # Check if GitHub repository exists
+    if github_service.repository_exists(name_lower):
+        raise HTTPException(
+            status_code=400,
+            detail=f"GitHub repository '{name_lower}' already exists"
+        )
+
+    # Create database record
+    project = Project(
+        name=name_lower,
+        description=description or f"Apache Camel YAML DSL microservice",
+        template_type="camel-yaml-api",
+        status="pending",
+        user_id=current_user.id,
+    )
+
+    db.add(project)
+    db.commit()
+    db.refresh(project)
+
+    # Start background workflow
+    background_tasks.add_task(
+        create_camel_yaml_project_workflow,
+        project.id,
+        name_lower,
+        description or "",
+        routes_content,
+        port,
+        db
+    )
+
+    logger.info(f"Started Camel YAML project creation: {name_lower}")
     return project
 
 

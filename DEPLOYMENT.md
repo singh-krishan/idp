@@ -6,7 +6,7 @@ This guide covers the production deployment of the IDP Platform to EC2, includin
 
 ## Current Production Setup
 
-- **EC2 Instance:** 13.42.36.97 (t3.medium, eu-west-2)
+- **EC2 Instance:** 51.24.49.197 (Elastic IP: eipalloc-0cf4699a3f7e06022, t3.micro, eu-west-2)
 - **Domain:** https://kris-idp.org
 - **Deployment Method:** Docker Compose via `deploy.sh` script
 - **Database:** SQLite (`/home/ec2-user/idp/backend/idp.db`)
@@ -107,7 +107,7 @@ If you need to run migrations manually:
 
 ```bash
 # SSH into EC2
-ssh -i ~/.ssh/idp-demo-key-new.pem ec2-user@13.42.36.97
+ssh -i ~/.ssh/idp-demo-key-new.pem ec2-user@51.24.49.197
 
 # Navigate to project
 cd /home/ec2-user/idp
@@ -162,7 +162,7 @@ alembic revision --autogenerate -m "description of changes"
 
 ```bash
 # From local machine
-ssh -i ~/.ssh/idp-demo-key-new.pem ec2-user@13.42.36.97 \
+ssh -i ~/.ssh/idp-demo-key-new.pem ec2-user@51.24.49.197 \
   "docker exec idp-backend sqlite3 /app/idp.db '.backup /app/idp-backup.db'"
 
 scp -i ~/.ssh/idp-demo-key-new.pem \
@@ -186,7 +186,7 @@ crontab -e
 
 ```bash
 # SSH into EC2
-ssh -i ~/.ssh/idp-demo-key-new.pem ec2-user@13.42.36.97
+ssh -i ~/.ssh/idp-demo-key-new.pem ec2-user@51.24.49.197
 
 cd /home/ec2-user/idp
 
@@ -210,7 +210,7 @@ docker-compose start backend
 
 **Fix:**
 ```bash
-ssh -i ~/.ssh/idp-demo-key-new.pem ec2-user@13.42.36.97
+ssh -i ~/.ssh/idp-demo-key-new.pem ec2-user@51.24.49.197
 cd /home/ec2-user/idp
 docker exec idp-backend alembic upgrade head
 docker-compose restart backend
@@ -371,7 +371,7 @@ npm run build  # Test production build
 
 ```bash
 # Real-time logs
-ssh -i ~/.ssh/idp-demo-key-new.pem ec2-user@13.42.36.97
+ssh -i ~/.ssh/idp-demo-key-new.pem ec2-user@51.24.49.197
 cd /home/ec2-user/idp
 docker-compose logs -f
 
@@ -395,7 +395,7 @@ docker-compose restart frontend
 
 ```bash
 # Certbot auto-renews, but to force renewal:
-ssh -i ~/.ssh/idp-demo-key-new.pem ec2-user@13.42.36.97
+ssh -i ~/.ssh/idp-demo-key-new.pem ec2-user@51.24.49.197
 sudo certbot renew --force-renewal
 sudo systemctl reload nginx
 ```
@@ -406,7 +406,7 @@ If a deployment causes issues:
 
 ```bash
 # SSH into EC2
-ssh -i ~/.ssh/idp-demo-key-new.pem ec2-user@13.42.36.97
+ssh -i ~/.ssh/idp-demo-key-new.pem ec2-user@51.24.49.197
 cd /home/ec2-user/idp
 
 # Restore database from backup (if needed)

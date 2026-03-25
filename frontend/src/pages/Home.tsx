@@ -5,24 +5,24 @@ export default function Home() {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       {/* Hero Section */}
       <div className="text-center mb-16">
-        <h1 className="text-5xl font-extrabold text-gray-900 mb-4">
-          Welcome to <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-pink-500">DevForge IDP</span>
+        <h1 className="text-5xl font-extrabold text-govuk-text mb-4">
+          Welcome to <span className="text-govuk-blue">DevForge IDP</span>
         </h1>
-        <p className="text-2xl text-gray-600 font-medium">
+        <p className="text-2xl text-govuk-secondary-text font-medium">
           Build and deploy microservices in minutes, not hours.
         </p>
-        <p className="mt-4 text-lg text-gray-500 max-w-3xl mx-auto">
+        <p className="mt-4 text-lg text-govuk-secondary-text max-w-3xl mx-auto">
           DevForge is an Internal Developer Platform that automates the entire lifecycle of creating, deploying, and managing microservices with production-ready infrastructure.
         </p>
       </div>
 
       {/* How It Works */}
       <section className="mb-16">
-        <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">How It Works</h2>
+        <h2 className="text-3xl font-bold text-govuk-text mb-8 text-center">How It Works</h2>
 
         {/* Step 1 */}
-        <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-          <h3 className="text-2xl font-bold text-indigo-600 mb-4">1. Choose a Template</h3>
+        <div className="card-govuk mb-6">
+          <h3 className="text-2xl font-bold text-govuk-blue mb-4">1. Choose a Template</h3>
           <p className="text-gray-700 mb-4">Select from pre-configured service templates:</p>
           <ul className="space-y-2 mb-4">
             <li className="flex items-start">
@@ -60,8 +60,8 @@ export default function Home() {
         </div>
 
         {/* Step 2 */}
-        <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-          <h3 className="text-2xl font-bold text-purple-600 mb-4">2. Create Your Project</h3>
+        <div className="card-govuk mb-6">
+          <h3 className="text-2xl font-bold text-govuk-success mb-4">2. Create Your Project</h3>
           <p className="text-gray-700 mb-4">Fill in a simple form:</p>
           <ul className="space-y-2 mb-4 text-gray-700">
             <li><span className="font-semibold">Project Name -</span> Choose a unique name (e.g., <code className="bg-gray-100 px-2 py-1 rounded text-sm">user-service</code>)</li>
@@ -79,8 +79,8 @@ export default function Home() {
         </div>
 
         {/* Step 3 */}
-        <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-          <h3 className="text-2xl font-bold text-pink-600 mb-4">3. Automated Deployment Flow</h3>
+        <div className="card-govuk mb-6">
+          <h3 className="text-2xl font-bold text-govuk-blue mb-4">3. Automated Deployment Flow</h3>
           <p className="text-gray-700 mb-4 font-semibold">Behind the scenes, the platform orchestrates:</p>
           <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg p-6 font-mono text-sm text-gray-800">
             <div className="space-y-2">
@@ -117,8 +117,8 @@ export default function Home() {
         </div>
 
         {/* Step 4 */}
-        <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-          <h3 className="text-2xl font-bold text-indigo-600 mb-4">4. Access Your API</h3>
+        <div className="card-govuk mb-6">
+          <h3 className="text-2xl font-bold text-govuk-blue mb-4">4. Access Your API</h3>
           <p className="text-gray-700 mb-4">Once your project status shows <span className="inline-block bg-green-100 text-green-800 px-2 py-1 rounded text-sm font-semibold">ACTIVE</span> (green badge):</p>
 
           <div className="mb-4">
@@ -165,9 +165,9 @@ export default function Home() {
       </section>
 
       {/* Quick Start Guide */}
-      <section className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-lg shadow-lg p-8 mb-16">
-        <h2 className="text-3xl font-bold text-gray-900 mb-6 text-center">Quick Start Guide</h2>
-        <h3 className="text-xl font-semibold text-indigo-600 mb-4">5-Minute Demo:</h3>
+      <section className="bg-[#d2e4f5] rounded-none border border-govuk-blue p-8 mb-16">
+        <h2 className="text-3xl font-bold text-govuk-text mb-6 text-center">Quick Start Guide</h2>
+        <h3 className="text-xl font-semibold text-govuk-blue mb-4">5-Minute Demo:</h3>
         <ol className="space-y-4 text-gray-700">
           <li className="flex items-start">
             <span className="font-bold text-indigo-600 mr-3 text-lg">1.</span>
@@ -232,8 +232,8 @@ export default function Home() {
       </section>
 
       {/* Project Status Guide */}
-      <section className="bg-white rounded-lg shadow-md p-8 mb-16">
-        <h2 className="text-3xl font-bold text-gray-900 mb-6 text-center">Project Status Guide</h2>
+      <section className="card-govuk mb-16">
+        <h2 className="text-3xl font-bold text-govuk-text mb-6 text-center">Project Status Guide</h2>
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
@@ -286,8 +286,8 @@ export default function Home() {
       </section>
 
       {/* Troubleshooting */}
-      <section className="bg-white rounded-lg shadow-md p-8 mb-16">
-        <h2 className="text-3xl font-bold text-gray-900 mb-6 text-center">Troubleshooting</h2>
+      <section className="card-govuk mb-16">
+        <h2 className="text-3xl font-bold text-govuk-text mb-6 text-center">Troubleshooting</h2>
         <div className="space-y-6">
           <div>
             <h3 className="text-lg font-semibold text-gray-900 mb-2">Q: My project shows "Failed" status</h3>
@@ -328,26 +328,26 @@ export default function Home() {
       </section>
 
       {/* Next Steps */}
-      <section className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 rounded-lg shadow-lg p-8 text-white">
+      <section className="bg-govuk-blue rounded-none border border-govuk-dark-blue p-8 text-white">
         <h2 className="text-3xl font-bold mb-6 text-center">Next Steps</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-          <div className="bg-white/10 rounded-lg p-6 backdrop-blur-sm">
+          <div className="bg-white/10 rounded-none p-6">
             <h3 className="text-xl font-semibold mb-3">✅ Create Your First Project</h3>
             <p className="mb-4">Start building your microservice in minutes</p>
             <Link
               to="/create"
-              className="inline-block bg-white text-indigo-600 px-6 py-3 rounded-lg font-semibold hover:bg-indigo-50 transition-colors"
+              className="inline-block bg-govuk-success text-white px-6 py-3 rounded-none font-bold hover:bg-[#005a30] transition-colors"
             >
               Create Project →
             </Link>
           </div>
 
-          <div className="bg-white/10 rounded-lg p-6 backdrop-blur-sm">
+          <div className="bg-white/10 rounded-none p-6">
             <h3 className="text-xl font-semibold mb-3">✅ View Dashboard</h3>
             <p className="mb-4">Monitor all your services in one place</p>
             <Link
               to="/dashboard"
-              className="inline-block bg-white text-purple-600 px-6 py-3 rounded-lg font-semibold hover:bg-purple-50 transition-colors"
+              className="inline-block bg-govuk-success text-white px-6 py-3 rounded-none font-bold hover:bg-[#005a30] transition-colors"
             >
               Go to Dashboard →
             </Link>
