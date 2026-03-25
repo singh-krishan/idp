@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {% raw %}{{ include "chart.fullname" . }}{% endraw %}
+  labels:
+    app: {{ cookiecutter.project_name }}
+spec:
+  replicas: {% raw %}{{ .Values.replicaCount }}{% endraw %}
+  selector:
+    matchLabels:
+      app: {{ cookiecutter.project_name }}
+  template:
+    metadata:
+      labels:
+        app: {{ cookiecutter.project_name }}
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: {% raw %}"{{ .Values.service.targetPort }}"{% endraw %}
+        prometheus.io/path: "/metrics"
+        {% raw %}{{- toYaml .Values.podAnnotations | nindent 8 }}{% endraw %}
+    spec:
+      containers:
+      - name: {{ cookiecutter.project_name }}
+        image: {% raw %}"{{ .Values.image.repository }}:{{ .Values.image.tag }}"{% endraw %}
+        imagePullPolicy: {% raw %}{{ .Values.image.pullPolicy }}{% endraw %}
+        ports:
+        - name: http
+          containerPort: {% raw %}{{ .Values.service.targetPort }}{% endraw %}
+          protocol: TCP
+        env:
+        {% raw %}{{- range .Values.env }}
+        - name: {{ .name }}
+          value: {{ .value | quote }}
+        {{- end }}{% endraw %}
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: http
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: http
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        resources:
+          {% raw %}{{- toYaml .Values.resources | nindent 10 }}{% endraw %}

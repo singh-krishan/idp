@@ -1,30 +1,126 @@
+/* Import font */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
+@layer base {
+  html {
+    font-family: 'Inter', 'Arial', sans-serif;
+  }
 
-  color-scheme: light;
-  color: #213547;
-  background-color: #ffffff;
+  body {
+    @apply bg-govuk-background text-govuk-text;
+    font-size: 19px;
+    line-height: 1.47;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    margin: 0;
+    min-width: 320px;
+    min-height: 100vh;
+  }
 
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  #root {
+    width: 100%;
+  }
+
+  /* GOV.UK focus styles */
+  *:focus {
+    outline: 3px solid #ffdd00;
+    outline-offset: 0;
+  }
+
+  /* Remove focus outline for mouse users only */
+  *:focus:not(:focus-visible) {
+    outline: none;
+  }
+
+  *:focus-visible {
+    outline: 3px solid #ffdd00;
+    outline-offset: 0;
+  }
+
+  /* Links */
+  a {
+    @apply text-govuk-link underline;
+  }
+
+  a:hover {
+    @apply text-govuk-link-hover;
+  }
+
+  a:visited {
+    @apply text-govuk-link-visited;
+  }
+
+  /* Headings */
+  h1 {
+    @apply text-heading-xl font-bold mb-6;
+  }
+
+  h2 {
+    @apply text-heading-l font-bold mb-4;
+  }
+
+  h3 {
+    @apply text-heading-m font-bold mb-3;
+  }
+
+  h4 {
+    @apply text-heading-s font-bold mb-2;
+  }
 }
 
-body {
-  margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
-}
+@layer components {
+  /* GOV.UK Button styles */
+  .btn-govuk {
+    @apply bg-govuk-success text-white font-bold py-2 px-4 rounded-none;
+    @apply hover:bg-[#005a30] focus:outline-none focus:ring-2 focus:ring-govuk-focus;
+    @apply disabled:opacity-50 disabled:cursor-not-allowed;
+  }
 
-#root {
-  width: 100%;
+  .btn-govuk-secondary {
+    @apply bg-govuk-background text-govuk-text border-2 border-govuk-text;
+    @apply hover:bg-[#e8e8e8] focus:outline-none focus:ring-2 focus:ring-govuk-focus;
+  }
+
+  .btn-govuk-warning {
+    @apply bg-govuk-error text-white;
+    @apply hover:bg-[#942514];
+  }
+
+  /* GOV.UK Input styles */
+  .input-govuk {
+    @apply border-2 border-govuk-input-border rounded-none py-1 px-2;
+    @apply focus:outline-none focus:ring-2 focus:ring-govuk-focus;
+    @apply text-govuk-text text-body;
+  }
+
+  .input-govuk-error {
+    @apply border-govuk-error focus:ring-govuk-error;
+  }
+
+  /* GOV.UK Card styles */
+  .card-govuk {
+    @apply bg-white border border-govuk-border p-6 rounded-none shadow-none;
+  }
+
+  /* Status badges */
+  .badge-status {
+    @apply inline-flex items-center px-3 py-1 rounded-none text-sm font-bold;
+  }
+
+  /* Screen reader only */
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+  }
 }

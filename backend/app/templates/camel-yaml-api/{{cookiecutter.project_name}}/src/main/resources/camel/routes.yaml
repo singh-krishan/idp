@@ -1,0 +1,49 @@
+# Apache Camel YAML DSL Routes for {{ cookiecutter.project_name }}
+# Documentation: https://camel.apache.org/camel-k/latest/languages/yaml.html
+
+# Root endpoint
+- route:
+    id: root-route
+    from:
+      uri: platform-http:/
+      steps:
+        - setHeader:
+            name: Content-Type
+            constant: application/json
+        - setBody:
+            constant: '{"message":"Welcome to {{ cookiecutter.project_name }}","version":"0.1.0"}'
+
+# Health check endpoint
+- route:
+    id: health-route
+    from:
+      uri: platform-http:/health
+      steps:
+        - setHeader:
+            name: Content-Type
+            constant: application/json
+        - setBody:
+            constant: '{"status":"healthy","service":"{{ cookiecutter.project_name }}"}'
+
+# Hello endpoint
+- route:
+    id: hello-route
+    from:
+      uri: platform-http:/hello
+      steps:
+        - setHeader:
+            name: Content-Type
+            constant: application/json
+        - setBody:
+            constant: '{"message":"hello, welcome to my IDP"}'
+
+# Example timer route (logs every 10 seconds)
+- route:
+    id: timer-route
+    from:
+      uri: timer:heartbeat?period=10000
+      steps:
+        - setBody:
+            simple: "{{ cookiecutter.project_name }} heartbeat at ${header.firedTime}"
+        - log:
+            message: "${body}"

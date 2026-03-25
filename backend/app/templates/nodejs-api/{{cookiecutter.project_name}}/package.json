@@ -6,7 +6,19 @@
   "scripts": {
     "start": "node src/index.js",
     "dev": "nodemon src/index.js",
-    "test": "jest"
+    "test": "jest",
+    "test:coverage": "jest --coverage",
+    "test:watch": "jest --watch"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "coverageDirectory": "coverage",
+    "collectCoverageFrom": [
+      "src/**/*.js",
+      "!src/index.js"
+    ],
+    "coverageReporters": ["text", "html", "cobertura"],
+    "testMatch": ["**/tests/**/*.test.js"]
   },
   "keywords": ["api", "nodejs", "express"],
   "author": "{{ cookiecutter.author }}",

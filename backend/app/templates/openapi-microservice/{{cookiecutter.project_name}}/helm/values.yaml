@@ -1,0 +1,43 @@
+replicaCount: 1
+
+image:
+  repository: ghcr.io/{{ cookiecutter.github_org }}/{{ cookiecutter.project_name }}
+  pullPolicy: Always
+  tag: "latest"
+
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: {{ cookiecutter.port }}
+
+ingress:
+  enabled: true
+  host: kris-idp.org
+  path: {{ cookiecutter.project_name }}
+  tlsSecretName: kris-idp-tls
+
+namespace: default
+
+resources:
+  limits:
+    cpu: 200m
+    memory: 256Mi
+  requests:
+    cpu: 50m
+    memory: 128Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 3
+  targetCPUUtilizationPercentage: 80
+
+env:
+  - name: PORT
+    value: "{{ cookiecutter.port }}"
+
+# Dynatrace monitoring annotations
+podAnnotations:
+  prometheus.io/scrape: "true"
+  prometheus.io/port: "{{ cookiecutter.port }}"
+  prometheus.io/path: "/metrics"

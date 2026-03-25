@@ -4,7 +4,7 @@
 
 set -e
 
-EC2_HOST="13.42.36.97"
+EC2_HOST="13.42.53.7"  # Dynamic public IP (Elastic IP removed)
 SSH_KEY="$HOME/.ssh/idp-demo-key-new.pem"
 
 echo "=== IDP Platform Deployment Script ==="

@@ -43,3 +43,9 @@ idp-projects/
 
 # Docker
 *.log
+
+# macOS metadata files
+._*
+.DS_Store
+.AppleDouble
+.LSOverride

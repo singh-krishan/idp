@@ -62,8 +62,14 @@ class TemplateEngine:
 
         # Extract variables from cookiecutter.json
         variables = []
+        skip_vars = config.get("_skip_variables", [])
+
         for key, value in config.items():
             if key.startswith("_"):
+                continue
+
+            # Skip variables that are in the skip list
+            if key in skip_vars:
                 continue
 
             variables.append({
@@ -73,11 +79,17 @@ class TemplateEngine:
                 "description": f"{key.replace('_', ' ').title()}"
             })
 
+        # Check if template requires file uploads
+        is_openapi = config.get("_openapi_template", False)
+        is_camel_yaml = config.get("_camel_yaml_template", False)
+
         return {
             "name": template_path.name,
             "display_name": template_path.name.replace("-", " ").title(),
             "description": f"{template_path.name} template",
-            "variables": variables
+            "variables": variables,
+            "requires_openapi_upload": is_openapi,
+            "requires_camel_yaml_upload": is_camel_yaml
         }
 
     def render_template(
@@ -109,6 +121,7 @@ class TemplateEngine:
         # Prepare cookiecutter context
         extra_context = variables or {}
         extra_context["project_name"] = project_name
+        extra_context["github_org"] = settings.github_org
 
         # Create unique output directory
         output_dir = self.temp_dir / f"{project_name}-{os.urandom(4).hex()}"

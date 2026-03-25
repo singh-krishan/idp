@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(kubectl:*)",
+      "Bash(docker exec:*)",
+      "Bash(alembic init:*)",
+      "Bash(docker-compose logs backend --tail 50)",
+      "Bash(docker-compose logs backend --tail 20)",
+      "Bash(docker-compose exec:*)",
+      "Bash(docker-compose logs:*)",
+      "Bash(python3:*)",
+      "Bash(aws rds describe-db-instances:*)",
+      "Bash(tree:*)",
+      "Bash(ssh:*)"
+    ]
+  }
+}

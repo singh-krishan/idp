@@ -1,0 +1,220 @@
+openapi: "3.0.3"
+info:
+  title: Pet Store API
+  version: "1.0.0"
+  description: A sample pet store API for testing OpenAPI code generation
+
+paths:
+  /pets:
+    get:
+      operationId: listPets
+      summary: List all pets
+      parameters:
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            default: 10
+      responses:
+        "200":
+          description: A list of pets
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Pet"
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+    post:
+      operationId: createPet
+      summary: Create a pet
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreatePetRequest"
+      responses:
+        "201":
+          description: Created pet
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Pet"
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /pets/{petId}:
+    parameters:
+      - name: petId
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+
+    get:
+      operationId: getPet
+      summary: Get a pet by ID
+      responses:
+        "200":
+          description: Pet details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Pet"
+        "404":
+          description: Pet not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+    put:
+      operationId: replacePet
+      summary: Replace a pet (full update)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdatePetRequest"
+      responses:
+        "200":
+          description: Updated pet
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Pet"
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: Pet not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+    patch:
+      operationId: updatePet
+      summary: Update a pet (partial update)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PatchPetRequest"
+      responses:
+        "200":
+          description: Updated pet
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Pet"
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: Pet not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+    delete:
+      operationId: deletePet
+      summary: Delete a pet
+      responses:
+        "204":
+          description: Pet deleted (no content)
+        "404":
+          description: Pet not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+components:
+  schemas:
+    Pet:
+      type: object
+      required: [id, name]
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: "Fluffy"
+        tag:
+          type: string
+          example: "cat"
+
+    CreatePetRequest:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+          example: "Fluffy"
+        tag:
+          type: string
+          example: "cat"
+
+    UpdatePetRequest:
+      type: object
+      description: Full replacement payload (PUT) - all fields required except server-generated id.
+      required: [name, tag]
+      properties:
+        name:
+          type: string
+          example: "Fluffy"
+        tag:
+          type: string
+          example: "cat"
+
+    PatchPetRequest:
+      type: object
+      description: Partial update payload (PATCH) - any subset of fields.
+      properties:
+        name:
+          type: string
+          example: "Fluffy"
+        tag:
+          type: string
+          example: "cat"
+
+    Error:
+      type: object
+      required: [code, message]
+      properties:
+        code:
+          type: string
+          example: "NOT_FOUND"
+        message:
+          type: string
+          example: "Pet not found."
+        details:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
