@@ -1,5 +1,4 @@
-/* Import font */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -7,15 +6,14 @@
 
 @layer base {
   html {
-    font-family: 'Inter', 'Arial', sans-serif;
+    font-family: 'DM Sans', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
   body {
-    @apply bg-govuk-background text-govuk-text;
-    font-size: 19px;
-    line-height: 1.47;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+    background-color: #0c1222;
+    color: #e5e7eb;
     margin: 0;
     min-width: 320px;
     min-height: 100vh;
@@ -25,102 +23,183 @@
     width: 100%;
   }
 
-  /* GOV.UK focus styles */
-  *:focus {
-    outline: 3px solid #ffdd00;
-    outline-offset: 0;
+  *:focus-visible {
+    outline: 2px solid rgba(59, 130, 246, 0.6);
+    outline-offset: 2px;
+    border-radius: 4px;
   }
 
-  /* Remove focus outline for mouse users only */
   *:focus:not(:focus-visible) {
     outline: none;
   }
 
-  *:focus-visible {
-    outline: 3px solid #ffdd00;
-    outline-offset: 0;
+  ::selection {
+    background: rgba(59, 130, 246, 0.3);
+    color: white;
   }
 
-  /* Links */
-  a {
-    @apply text-govuk-link underline;
-  }
-
-  a:hover {
-    @apply text-govuk-link-hover;
-  }
-
-  a:visited {
-    @apply text-govuk-link-visited;
-  }
-
-  /* Headings */
-  h1 {
-    @apply text-heading-xl font-bold mb-6;
-  }
-
-  h2 {
-    @apply text-heading-l font-bold mb-4;
-  }
-
-  h3 {
-    @apply text-heading-m font-bold mb-3;
-  }
-
-  h4 {
-    @apply text-heading-s font-bold mb-2;
-  }
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.2); }
 }
 
 @layer components {
-  /* GOV.UK Button styles */
-  .btn-govuk {
-    @apply bg-govuk-success text-white font-bold py-2 px-4 rounded-none;
-    @apply hover:bg-[#005a30] focus:outline-none focus:ring-2 focus:ring-govuk-focus;
-    @apply disabled:opacity-50 disabled:cursor-not-allowed;
+  .glass-card {
+    background: rgba(255, 255, 255, 0.04);
+    backdrop-filter: blur(24px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.05);
   }
 
-  .btn-govuk-secondary {
-    @apply bg-govuk-background text-govuk-text border-2 border-govuk-text;
-    @apply hover:bg-[#e8e8e8] focus:outline-none focus:ring-2 focus:ring-govuk-focus;
+  .glass-card-hover {
+    background: rgba(255, 255, 255, 0.04);
+    backdrop-filter: blur(24px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    transition: all 0.3s ease;
+  }
+  .glass-card-hover:hover {
+    background: rgba(255, 255, 255, 0.07);
+    border-color: rgba(255, 255, 255, 0.14);
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    transform: translateY(-1px);
   }
 
-  .btn-govuk-warning {
-    @apply bg-govuk-error text-white;
-    @apply hover:bg-[#942514];
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 14px;
+    color: white;
+    transition: all 0.2s ease;
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    box-shadow: 0 2px 12px rgba(59, 130, 246, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    border: none;
+    cursor: pointer;
+  }
+  .btn-primary:hover {
+    background: linear-gradient(135deg, #60a5fa, #3b82f6);
+    box-shadow: 0 4px 20px rgba(59, 130, 246, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    transform: translateY(-1px);
+  }
+  .btn-primary:active { transform: translateY(0); }
+  .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+  .btn-success {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 14px;
+    color: white;
+    transition: all 0.2s ease;
+    background: linear-gradient(135deg, #10b981, #059669);
+    box-shadow: 0 2px 12px rgba(16, 185, 129, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    border: none;
+    cursor: pointer;
+  }
+  .btn-success:hover {
+    background: linear-gradient(135deg, #34d399, #10b981);
+    box-shadow: 0 4px 20px rgba(16, 185, 129, 0.4);
+    transform: translateY(-1px);
+  }
+  .btn-success:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+  .btn-ghost {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-weight: 500;
+    font-size: 14px;
+    color: #d1d5db;
+    transition: all 0.2s ease;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    cursor: pointer;
+  }
+  .btn-ghost:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.14);
+    color: white;
   }
 
-  /* GOV.UK Input styles */
-  .input-govuk {
-    @apply border-2 border-govuk-input-border rounded-none py-1 px-2;
-    @apply focus:outline-none focus:ring-2 focus:ring-govuk-focus;
-    @apply text-govuk-text text-body;
+  .btn-danger {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 11px;
+    transition: all 0.2s ease;
+    background: rgba(244, 63, 94, 0.1);
+    color: #fb7185;
+    border: 1px solid rgba(244, 63, 94, 0.2);
+    cursor: pointer;
+  }
+  .btn-danger:hover {
+    background: rgba(244, 63, 94, 0.2);
+    border-color: rgba(244, 63, 94, 0.3);
   }
 
-  .input-govuk-error {
-    @apply border-govuk-error focus:ring-govuk-error;
+  .input-field {
+    width: 100%;
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+    color: white;
+    transition: all 0.2s ease;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  .input-field::placeholder { color: #6b7280; }
+  .input-field:focus {
+    border-color: rgba(59, 130, 246, 0.5);
+    background: rgba(255, 255, 255, 0.06);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
   }
 
-  /* GOV.UK Card styles */
-  .card-govuk {
-    @apply bg-white border border-govuk-border p-6 rounded-none shadow-none;
+  .input-label {
+    display: block;
+    font-size: 13px;
+    font-weight: 500;
+    color: #9ca3af;
+    margin-bottom: 6px;
   }
 
-  /* Status badges */
-  .badge-status {
-    @apply inline-flex items-center px-3 py-1 rounded-none text-sm font-bold;
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
   }
 
-  /* Screen reader only */
-  .sr-only {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-    border-width: 0;
+  .noise-overlay {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.015;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
   }
 }
+
+.animate-stagger-1 { animation-delay: 0.1s; }
+.animate-stagger-2 { animation-delay: 0.2s; }
+.animate-stagger-3 { animation-delay: 0.3s; }
+.animate-stagger-4 { animation-delay: 0.4s; }

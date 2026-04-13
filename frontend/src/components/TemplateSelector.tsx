@@ -6,52 +6,71 @@ interface TemplateSelectorProps {
   onSelect: (templateName: string) => void;
 }
 
+const templateIcons: Record<string, { icon: string; color: string }> = {
+  'python-microservice': { icon: 'Py', color: 'from-yellow-500 to-amber-600' },
+  'nodejs-api': { icon: 'Js', color: 'from-green-500 to-emerald-600' },
+  'openapi-microservice': { icon: 'OA', color: 'from-purple-500 to-violet-600' },
+  'camel-yaml-api': { icon: 'Ca', color: 'from-orange-500 to-red-500' },
+};
+
 export default function TemplateSelector({ templates, selectedTemplate, onSelect }: TemplateSelectorProps) {
   return (
-    <div className="space-y-4">
-      <label className="block text-sm font-medium text-govuk-text">
-        Select Template *
-      </label>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {templates.map((template) => (
-          <button
-            key={template.name}
-            type="button"
-            onClick={() => onSelect(template.name)}
-            className={`p-4 border-2 rounded-none text-left transition-all hover:shadow-sm ${
-              selectedTemplate === template.name
-                ? 'border-govuk-blue bg-[#d2e4f5]'
-                : 'border-govuk-border hover:border-govuk-blue'
-            }`}
-            aria-pressed={selectedTemplate === template.name}
-          >
-            <div className="flex items-start justify-between">
-              <div className="flex-1">
-                <h3 className="font-semibold text-lg text-govuk-text">
-                  {template.display_name}
-                </h3>
-                <p className="text-sm text-govuk-secondary-text mt-1">
-                  {template.description}
-                </p>
-                {template.requires_openapi_upload && (
-                  <span className="inline-flex items-center px-2 py-0.5 rounded-none text-xs font-medium bg-status-deploying text-white mt-2">
-                    Requires OpenAPI Spec
-                  </span>
-                )}
-                {template.requires_camel_yaml_upload && (
-                  <span className="inline-flex items-center px-2 py-0.5 rounded-none text-xs font-medium bg-orange-500 text-white mt-2">
-                    Requires Camel YAML Routes
-                  </span>
+    <div className="space-y-3">
+      <label className="input-label">Select Template</label>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        {templates.map((template) => {
+          const isSelected = selectedTemplate === template.name;
+          const iconConfig = templateIcons[template.name] || { icon: '?', color: 'from-gray-500 to-gray-600' };
+
+          return (
+            <button
+              key={template.name}
+              type="button"
+              onClick={() => onSelect(template.name)}
+              className={`relative p-4 rounded-xl text-left transition-all duration-200 border ${
+                isSelected
+                  ? 'bg-accent-500/10 border-accent-500/40 shadow-glow'
+                  : 'bg-white/[0.03] border-white/[0.06] hover:bg-white/[0.06] hover:border-white/[0.12]'
+              }`}
+              aria-pressed={isSelected}
+            >
+              <div className="flex items-start gap-3">
+                {/* Template icon */}
+                <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${iconConfig.color} flex items-center justify-center flex-shrink-0 shadow-sm`}>
+                  <span className="text-white text-xs font-bold font-mono">{iconConfig.icon}</span>
+                </div>
+
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-display font-semibold text-sm text-white truncate">
+                    {template.display_name}
+                  </h3>
+                  <p className="text-xs text-gray-500 mt-0.5 line-clamp-2">
+                    {template.description}
+                  </p>
+                  {template.requires_openapi_upload && (
+                    <span className="inline-flex items-center mt-2 px-2 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wider bg-purple-500/15 text-purple-400 border border-purple-500/20">
+                      OpenAPI Spec
+                    </span>
+                  )}
+                  {template.requires_camel_yaml_upload && (
+                    <span className="inline-flex items-center mt-2 px-2 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wider bg-orange-500/15 text-orange-400 border border-orange-500/20">
+                      YAML Routes
+                    </span>
+                  )}
+                </div>
+
+                {/* Selected check */}
+                {isSelected && (
+                  <div className="w-5 h-5 rounded-full bg-accent-500 flex items-center justify-center flex-shrink-0">
+                    <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
                 )}
               </div>
-              {selectedTemplate === template.name && (
-                <svg className="w-6 h-6 text-govuk-blue" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                </svg>
-              )}
-            </div>
-          </button>
-        ))}
+            </button>
+          );
+        })}
       </div>
     </div>
   );

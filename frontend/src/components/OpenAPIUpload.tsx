@@ -23,127 +23,71 @@ export default function OpenAPIUpload({ onFileSelected, selectedFile, error }: O
   };
 
   const validateAndSetFile = (file: File | null) => {
-    if (!file) {
-      onFileSelected(null);
-      return;
-    }
-
+    if (!file) { onFileSelected(null); return; }
     const validExtensions = ['.yaml', '.yml', '.json'];
-    const isValid = validExtensions.some(ext => file.name.toLowerCase().endsWith(ext));
-
-    if (!isValid) {
+    if (!validExtensions.some(ext => file.name.toLowerCase().endsWith(ext))) {
       alert('Please upload a .yaml, .yml, or .json file');
       return;
     }
-
-    if (file.size > 1_048_576) {
-      alert('File size must be under 1MB');
-      return;
-    }
-
+    if (file.size > 1_048_576) { alert('File size must be under 1MB'); return; }
     onFileSelected(file);
-  };
-
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-    setDragOver(true);
-  };
-
-  const handleDragLeave = () => {
-    setDragOver(false);
   };
 
   const handleRemove = () => {
     onFileSelected(null);
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
-    }
+    if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
   return (
-    <div className="space-y-4">
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          OpenAPI Specification File *
-        </label>
+    <div className="space-y-2">
+      <label className="input-label">OpenAPI Specification *</label>
 
-        {!selectedFile ? (
-          <div
-            onDrop={handleDrop}
-            onDragOver={handleDragOver}
-            onDragLeave={handleDragLeave}
-            onClick={() => fileInputRef.current?.click()}
-            className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors ${
-              dragOver
-                ? 'border-blue-500 bg-blue-50'
-                : 'border-gray-300 hover:border-gray-400 bg-gray-50'
-            }`}
-          >
-            <svg
-              className="mx-auto h-12 w-12 text-gray-400"
-              stroke="currentColor"
-              fill="none"
-              viewBox="0 0 48 48"
-            >
-              <path
-                d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
-                strokeWidth={2}
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
+      {!selectedFile ? (
+        <div
+          onDrop={handleDrop}
+          onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+          onDragLeave={() => setDragOver(false)}
+          onClick={() => fileInputRef.current?.click()}
+          className={`border border-dashed rounded-xl p-6 text-center cursor-pointer transition-all duration-200 ${
+            dragOver
+              ? 'border-accent-500/50 bg-accent-500/5'
+              : 'border-white/[0.1] hover:border-white/[0.2] bg-white/[0.02]'
+          }`}
+        >
+          <div className="w-10 h-10 rounded-lg bg-purple-500/10 flex items-center justify-center mx-auto mb-3">
+            <svg className="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
             </svg>
-            <p className="mt-2 text-sm text-gray-600">
-              <span className="font-medium text-blue-600">Click to upload</span> or drag and drop
-            </p>
-            <p className="mt-1 text-xs text-gray-500">.yaml, .yml, or .json files (max 1MB)</p>
           </div>
-        ) : (
-          <div className="border border-gray-300 rounded-lg p-4 bg-white">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-3">
-                <svg
-                  className="h-8 w-8 text-blue-500"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                  />
-                </svg>
-                <div>
-                  <p className="text-sm font-medium text-gray-900">{selectedFile.name}</p>
-                  <p className="text-xs text-gray-500">
-                    {(selectedFile.size / 1024).toFixed(2)} KB
-                  </p>
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={handleRemove}
-                className="text-red-600 hover:text-red-800 text-sm font-medium"
-              >
-                Remove
-              </button>
+          <p className="text-sm text-gray-400">
+            <span className="text-accent-400 font-medium">Click to upload</span> or drag and drop
+          </p>
+          <p className="text-[11px] text-gray-600 mt-1">.yaml, .yml, or .json (max 1MB)</p>
+        </div>
+      ) : (
+        <div className="flex items-center justify-between p-3 rounded-lg bg-white/[0.04] border border-white/[0.08]">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="w-8 h-8 rounded-md bg-purple-500/15 flex items-center justify-center flex-shrink-0">
+              <svg className="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+              </svg>
+            </div>
+            <div className="min-w-0">
+              <p className="text-sm text-white font-medium truncate">{selectedFile.name}</p>
+              <p className="text-[11px] text-gray-500">{(selectedFile.size / 1024).toFixed(1)} KB</p>
             </div>
           </div>
-        )}
+          <button type="button" onClick={handleRemove} className="text-xs text-rose-400 hover:text-rose-300 font-medium ml-3 flex-shrink-0">
+            Remove
+          </button>
+        </div>
+      )}
 
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept=".yaml,.yml,.json"
-          onChange={handleFileChange}
-          className="hidden"
-        />
-      </div>
+      <input ref={fileInputRef} type="file" accept=".yaml,.yml,.json" onChange={handleFileChange} className="hidden" />
 
       {error && (
-        <div className="text-sm text-red-600 bg-red-50 border border-red-200 rounded px-3 py-2">
-          {error}
+        <div className="px-3 py-2 rounded-lg bg-rose-500/10 border border-rose-500/20">
+          <p className="text-xs text-rose-400">{error}</p>
         </div>
       )}
     </div>

@@ -1,365 +1,181 @@
 import { Link } from 'react-router-dom'
 
+const steps = [
+  {
+    number: '01',
+    title: 'Choose a Template',
+    description: 'Python FastAPI, Node.js Express, OpenAPI spec, or Apache Camel YAML DSL.',
+    color: 'from-accent-500 to-accent-700',
+  },
+  {
+    number: '02',
+    title: 'Configure & Create',
+    description: 'Name your service, set options, upload specs if needed. One click to launch.',
+    color: 'from-emerald-500 to-emerald-700',
+  },
+  {
+    number: '03',
+    title: 'Automated Pipeline',
+    description: 'GitHub repo, CI/CD, Docker build, ArgoCD sync — all fully automated.',
+    color: 'from-purple-500 to-purple-700',
+  },
+  {
+    number: '04',
+    title: 'Live in Minutes',
+    description: 'Your service deploys to Kubernetes with HTTPS, health checks, and monitoring.',
+    color: 'from-cyan-500 to-cyan-700',
+  },
+]
+
+const features = [
+  { icon: '{}', label: 'Source Code', desc: 'Best-practice project structure' },
+  { icon: '🐳', label: 'Docker', desc: 'Multi-stage containerization' },
+  { icon: '⚡', label: 'CI/CD', desc: 'GitHub Actions pipeline' },
+  { icon: '☸️', label: 'Helm Charts', desc: 'Kubernetes deployment' },
+  { icon: '💚', label: 'Health Checks', desc: 'Liveness & readiness probes' },
+  { icon: '📊', label: 'Monitoring', desc: 'Prometheus & Grafana' },
+]
+
+const techStack = [
+  { name: 'FastAPI', role: 'Backend API' },
+  { name: 'React', role: 'Frontend' },
+  { name: 'GitHub', role: 'Source & CI/CD' },
+  { name: 'ArgoCD', role: 'GitOps' },
+  { name: 'k3s', role: 'Kubernetes' },
+  { name: 'NGINX', role: 'Ingress & TLS' },
+  { name: 'Prometheus', role: 'Metrics' },
+  { name: 'PostgreSQL', role: 'Database' },
+]
+
 export default function Home() {
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      {/* Hero Section */}
-      <div className="text-center mb-16">
-        <h1 className="text-5xl font-extrabold text-govuk-text mb-4">
-          Welcome to <span className="text-govuk-blue">DevForge IDP</span>
-        </h1>
-        <p className="text-2xl text-govuk-secondary-text font-medium">
-          Build and deploy microservices in minutes, not hours.
-        </p>
-        <p className="mt-4 text-lg text-govuk-secondary-text max-w-3xl mx-auto">
-          DevForge is an Internal Developer Platform that automates the entire lifecycle of creating, deploying, and managing microservices with production-ready infrastructure.
-        </p>
+    <div>
+      {/* Hero */}
+      <div className="relative overflow-hidden border-b border-white/[0.06]">
+        <div className="absolute inset-0 bg-hero-glow" />
+        <div className="absolute inset-0 bg-grid-pattern bg-grid opacity-30" />
+        <div className="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-24 text-center">
+          <h1 className="font-display text-5xl sm:text-6xl font-extrabold text-white tracking-tight animate-fade-in">
+            Deploy microservices
+            <br />
+            <span className="bg-gradient-to-r from-accent-400 via-cyber-cyan to-accent-400 bg-clip-text text-transparent">
+              in minutes, not hours
+            </span>
+          </h1>
+          <p className="mt-6 text-lg text-gray-400 max-w-2xl mx-auto animate-fade-in" style={{ animationDelay: '0.15s' }}>
+            DevForge automates the entire lifecycle — from template to production.
+            GitHub repo, CI/CD, Docker, Kubernetes, monitoring — all with one click.
+          </p>
+          <div className="mt-10 flex items-center justify-center gap-4 animate-fade-in" style={{ animationDelay: '0.3s' }}>
+            <Link to="/create" className="btn-success text-sm no-underline px-6 py-3">
+              Create Project
+              <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+              </svg>
+            </Link>
+            <Link to="/dashboard" className="btn-ghost text-sm no-underline px-6 py-3">
+              Dashboard
+            </Link>
+          </div>
+        </div>
       </div>
 
-      {/* How It Works */}
-      <section className="mb-16">
-        <h2 className="text-3xl font-bold text-govuk-text mb-8 text-center">How It Works</h2>
+      {/* How it works */}
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+        <h2 className="font-display text-3xl font-bold text-white text-center mb-12">How It Works</h2>
 
-        {/* Step 1 */}
-        <div className="card-govuk mb-6">
-          <h3 className="text-2xl font-bold text-govuk-blue mb-4">1. Choose a Template</h3>
-          <p className="text-gray-700 mb-4">Select from pre-configured service templates:</p>
-          <ul className="space-y-2 mb-4">
-            <li className="flex items-start">
-              <span className="font-semibold text-gray-900 mr-2">• Python Microservice -</span>
-              <span className="text-gray-700">FastAPI with health checks, Docker, and Helm charts</span>
-            </li>
-            <li className="flex items-start">
-              <span className="font-semibold text-gray-900 mr-2">• Node.js API -</span>
-              <span className="text-gray-700">Express.js with testing setup and deployment configs</span>
-            </li>
-          </ul>
-          <p className="text-gray-700 font-semibold mb-2">Each template includes:</p>
-          <ul className="grid grid-cols-1 md:grid-cols-2 gap-2 text-gray-700">
-            <li className="flex items-center">
-              <span className="text-green-500 mr-2">✓</span>
-              Complete source code with best practices
-            </li>
-            <li className="flex items-center">
-              <span className="text-green-500 mr-2">✓</span>
-              Dockerfile for containerization
-            </li>
-            <li className="flex items-center">
-              <span className="text-green-500 mr-2">✓</span>
-              GitHub Actions CI/CD pipeline
-            </li>
-            <li className="flex items-center">
-              <span className="text-green-500 mr-2">✓</span>
-              Helm charts for Kubernetes deployment
-            </li>
-            <li className="flex items-center">
-              <span className="text-green-500 mr-2">✓</span>
-              Health check endpoints
-            </li>
-          </ul>
-        </div>
-
-        {/* Step 2 */}
-        <div className="card-govuk mb-6">
-          <h3 className="text-2xl font-bold text-govuk-success mb-4">2. Create Your Project</h3>
-          <p className="text-gray-700 mb-4">Fill in a simple form:</p>
-          <ul className="space-y-2 mb-4 text-gray-700">
-            <li><span className="font-semibold">Project Name -</span> Choose a unique name (e.g., <code className="bg-gray-100 px-2 py-1 rounded text-sm">user-service</code>)</li>
-            <li><span className="font-semibold">Description -</span> Brief description of what your service does</li>
-            <li><span className="font-semibold">Port -</span> Service port (default: 8000 for Python, 3000 for Node.js)</li>
-          </ul>
-          <p className="text-gray-700 mb-3">Click <span className="font-bold">"Create Project"</span> and the platform automatically:</p>
-          <ol className="list-decimal list-inside space-y-2 text-gray-700 ml-4">
-            <li>Generates code from template with your project name</li>
-            <li>Creates a GitHub repository under your organization</li>
-            <li>Pushes all code with initial commit</li>
-            <li>Creates an ArgoCD application for GitOps deployment</li>
-            <li>Deploys your service to Kubernetes</li>
-          </ol>
-        </div>
-
-        {/* Step 3 */}
-        <div className="card-govuk mb-6">
-          <h3 className="text-2xl font-bold text-govuk-blue mb-4">3. Automated Deployment Flow</h3>
-          <p className="text-gray-700 mb-4 font-semibold">Behind the scenes, the platform orchestrates:</p>
-          <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg p-6 font-mono text-sm text-gray-800">
-            <div className="space-y-2">
-              <div>Your Request</div>
-              <div className="ml-4">↓</div>
-              <div>Backend API (FastAPI)</div>
-              <div className="ml-4">↓</div>
-              <div>Template Engine → Generates project files</div>
-              <div className="ml-4">↓</div>
-              <div>GitHub → Creates repo and pushes code</div>
-              <div className="ml-4">↓</div>
-              <div>GitHub Actions → Builds Docker image and pushes to registry</div>
-              <div className="ml-4">↓</div>
-              <div>ArgoCD → Detects new app and syncs to Kubernetes</div>
-              <div className="ml-4">↓</div>
-              <div>Kubernetes → Deploys your service with Ingress</div>
-              <div className="ml-4">↓</div>
-              <div className="font-bold text-green-600">Your Service is LIVE! 🎉</div>
-            </div>
-          </div>
-          <div className="mt-6">
-            <p className="text-gray-700 font-semibold mb-3">Technology Stack:</p>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-gray-700">
-              <div><span className="font-semibold">Backend:</span> FastAPI (Python) - REST API orchestrating the workflow</div>
-              <div><span className="font-semibold">Frontend:</span> React + TypeScript - This web interface</div>
-              <div><span className="font-semibold">Source Control:</span> GitHub - Code repository and CI/CD</div>
-              <div><span className="font-semibold">GitOps:</span> ArgoCD - Automated deployment and sync</div>
-              <div><span className="font-semibold">Container Orchestration:</span> Kubernetes (k3s) - Running your services</div>
-              <div><span className="font-semibold">Ingress:</span> Nginx Ingress Controller - Exposing services via HTTPS</div>
-              <div><span className="font-semibold">SSL:</span> cert-manager + Let's Encrypt - Automatic HTTPS certificates</div>
-              <div><span className="font-semibold">Database:</span> PostgreSQL - Storing project metadata</div>
-            </div>
-          </div>
-        </div>
-
-        {/* Step 4 */}
-        <div className="card-govuk mb-6">
-          <h3 className="text-2xl font-bold text-govuk-blue mb-4">4. Access Your API</h3>
-          <p className="text-gray-700 mb-4">Once your project status shows <span className="inline-block bg-green-100 text-green-800 px-2 py-1 rounded text-sm font-semibold">ACTIVE</span> (green badge):</p>
-
-          <div className="mb-4">
-            <p className="font-semibold text-gray-900 mb-2">Option 1: Via Ingress URL</p>
-            <div className="bg-gray-100 rounded-lg p-4 font-mono text-sm">
-              https://kris-idp.duckdns.org/&lt;your-project-name&gt;/hello
-            </div>
-            <p className="mt-2 text-gray-700">Example:</p>
-            <div className="bg-gray-800 text-green-400 rounded-lg p-4 font-mono text-sm mt-2">
-              curl https://kris-idp.duckdns.org/user-service/hello
-            </div>
-          </div>
-
-          <div className="mb-4">
-            <p className="font-semibold text-gray-900 mb-2">Option 2: Direct Access (for testing)</p>
-            <ul className="list-disc list-inside space-y-1 text-gray-700 ml-4 mb-2">
-              <li>Click on your project in the Dashboard</li>
-              <li>Find the service endpoint details</li>
-              <li>Use port-forward for local testing:</li>
-            </ul>
-            <div className="bg-gray-800 text-green-400 rounded-lg p-4 font-mono text-sm">
-              kubectl port-forward svc/&lt;your-service-name&gt; 8000:80<br />
-              curl http://localhost:8000/hello
-            </div>
-          </div>
-
-          <div className="mb-4">
-            <p className="font-semibold text-gray-900 mb-2">API Endpoints (Python template):</p>
-            <ul className="list-disc list-inside space-y-1 text-gray-700 ml-4">
-              <li><code className="bg-gray-100 px-2 py-1 rounded text-sm">GET /hello</code> - Hello world endpoint</li>
-              <li><code className="bg-gray-100 px-2 py-1 rounded text-sm">GET /health</code> - Health check (used by Kubernetes probes)</li>
-              <li><code className="bg-gray-100 px-2 py-1 rounded text-sm">GET /docs</code> - Interactive API documentation (Swagger UI)</li>
-            </ul>
-          </div>
-
-          <div>
-            <p className="font-semibold text-gray-900 mb-2">API Endpoints (Node.js template):</p>
-            <ul className="list-disc list-inside space-y-1 text-gray-700 ml-4">
-              <li><code className="bg-gray-100 px-2 py-1 rounded text-sm">GET /hello</code> - Hello world endpoint</li>
-              <li><code className="bg-gray-100 px-2 py-1 rounded text-sm">GET /health</code> - Health check</li>
-            </ul>
-          </div>
-        </div>
-      </section>
-
-      {/* Quick Start Guide */}
-      <section className="bg-[#d2e4f5] rounded-none border border-govuk-blue p-8 mb-16">
-        <h2 className="text-3xl font-bold text-govuk-text mb-6 text-center">Quick Start Guide</h2>
-        <h3 className="text-xl font-semibold text-govuk-blue mb-4">5-Minute Demo:</h3>
-        <ol className="space-y-4 text-gray-700">
-          <li className="flex items-start">
-            <span className="font-bold text-indigo-600 mr-3 text-lg">1.</span>
-            <div>
-              <span className="font-semibold">Login</span> - Use your credentials or register a new account
-            </div>
-          </li>
-          <li className="flex items-start">
-            <span className="font-bold text-indigo-600 mr-3 text-lg">2.</span>
-            <div>
-              <span className="font-semibold">Go to Create Project</span> - Click "Create Project" in the navigation
-            </div>
-          </li>
-          <li className="flex items-start">
-            <span className="font-bold text-indigo-600 mr-3 text-lg">3.</span>
-            <div>
-              <span className="font-semibold">Fill the form:</span>
-              <ul className="list-disc list-inside ml-4 mt-1">
-                <li>Name: <code className="bg-white px-2 py-1 rounded text-sm">my-first-service</code></li>
-                <li>Description: <code className="bg-white px-2 py-1 rounded text-sm">My first API</code></li>
-                <li>Template: <code className="bg-white px-2 py-1 rounded text-sm">Python Microservice</code></li>
-                <li>Port: <code className="bg-white px-2 py-1 rounded text-sm">8000</code></li>
-              </ul>
-            </div>
-          </li>
-          <li className="flex items-start">
-            <span className="font-bold text-indigo-600 mr-3 text-lg">4.</span>
-            <div>
-              <span className="font-semibold">Click "Create Project"</span>
-            </div>
-          </li>
-          <li className="flex items-start">
-            <span className="font-bold text-indigo-600 mr-3 text-lg">5.</span>
-            <div>
-              <span className="font-semibold">Watch the magic happen:</span>
-              <ul className="list-disc list-inside ml-4 mt-1">
-                <li>Status changes: Pending → Building → Active</li>
-                <li>GitHub repo appears with your code</li>
-                <li>Service deploys to Kubernetes automatically</li>
-              </ul>
-            </div>
-          </li>
-          <li className="flex items-start">
-            <span className="font-bold text-indigo-600 mr-3 text-lg">6.</span>
-            <div>
-              <span className="font-semibold">Test your API:</span>
-              <div className="bg-gray-800 text-green-400 rounded-lg p-3 font-mono text-sm mt-2">
-                curl https://kris-idp.duckdns.org/my-first-service/hello
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          {steps.map((step, i) => (
+            <div key={step.number} className="glass-card-hover p-5 animate-slide-up" style={{ animationDelay: `${i * 0.1}s` }}>
+              <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${step.color} flex items-center justify-center mb-4 shadow-sm`}>
+                <span className="text-white text-xs font-bold font-mono">{step.number}</span>
               </div>
+              <h3 className="font-display font-semibold text-white text-sm mb-1.5">{step.title}</h3>
+              <p className="text-xs text-gray-500 leading-relaxed">{step.description}</p>
             </div>
-          </li>
-        </ol>
+          ))}
+        </div>
+      </div>
 
-        <div className="mt-6 bg-white rounded-lg p-4">
-          <p className="font-semibold text-gray-900 mb-2">Expected response:</p>
-          <div className="bg-gray-800 text-green-400 rounded-lg p-3 font-mono text-sm">
-            {`{`}<br />
-            &nbsp;&nbsp;"message": "Hello from my-first-service!"<br />
-            {`}`}
+      {/* What's included */}
+      <div className="border-y border-white/[0.06] bg-white/[0.01]">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+          <h2 className="font-display text-3xl font-bold text-white text-center mb-4">Every Template Includes</h2>
+          <p className="text-gray-500 text-center mb-12 max-w-lg mx-auto">Production-ready infrastructure from day one.</p>
+
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+            {features.map((f) => (
+              <div key={f.label} className="glass-card p-4 flex items-start gap-3">
+                <span className="text-lg">{f.icon}</span>
+                <div>
+                  <p className="text-sm font-medium text-white">{f.label}</p>
+                  <p className="text-xs text-gray-500 mt-0.5">{f.desc}</p>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
-      </section>
+      </div>
 
-      {/* Project Status Guide */}
-      <section className="card-govuk mb-16">
-        <h2 className="text-3xl font-bold text-govuk-text mb-6 text-center">Project Status Guide</h2>
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Meaning</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">What's Happening</th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              <tr>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-yellow-100 text-yellow-800">
-                    🟡 Pending
-                  </span>
-                </td>
-                <td className="px-6 py-4 text-gray-700">Queued</td>
-                <td className="px-6 py-4 text-gray-700">Template rendering in progress</td>
-              </tr>
-              <tr>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-blue-100 text-blue-800">
-                    🔵 Building
-                  </span>
-                </td>
-                <td className="px-6 py-4 text-gray-700">In Progress</td>
-                <td className="px-6 py-4 text-gray-700">GitHub repo created, CI/CD running, ArgoCD syncing</td>
-              </tr>
-              <tr>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-green-100 text-green-800">
-                    🟢 Active
-                  </span>
-                </td>
-                <td className="px-6 py-4 text-gray-700">Live</td>
-                <td className="px-6 py-4 text-gray-700">Service deployed and healthy, API accessible</td>
-              </tr>
-              <tr>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-red-100 text-red-800">
-                    🔴 Failed
-                  </span>
-                </td>
-                <td className="px-6 py-4 text-gray-700">Error</td>
-                <td className="px-6 py-4 text-gray-700">Deployment issue - check error message</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </section>
+      {/* Architecture flow */}
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+        <h2 className="font-display text-3xl font-bold text-white text-center mb-12">Architecture</h2>
 
-      {/* Troubleshooting */}
-      <section className="card-govuk mb-16">
-        <h2 className="text-3xl font-bold text-govuk-text mb-6 text-center">Troubleshooting</h2>
-        <div className="space-y-6">
-          <div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">Q: My project shows "Failed" status</h3>
-            <ul className="list-disc list-inside space-y-1 text-gray-700 ml-4">
-              <li>Click on the project to view error details</li>
-              <li>Common issues: Port conflicts, invalid project name, GitHub rate limits</li>
-              <li>Try: Use a different project name or port</li>
-            </ul>
-          </div>
-
-          <div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">Q: Service shows "Active" but API not responding</h3>
-            <ul className="list-disc list-inside space-y-1 text-gray-700 ml-4">
-              <li>Wait 2-3 minutes for DNS propagation</li>
-              <li>Check if the pod is ready: <code className="bg-gray-100 px-2 py-1 rounded text-sm">kubectl get pods | grep &lt;your-project-name&gt;</code></li>
-              <li>Verify ingress: <code className="bg-gray-100 px-2 py-1 rounded text-sm">kubectl get ingress -n default</code></li>
-            </ul>
-          </div>
-
-          <div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">Q: How do I update my service code?</h3>
-            <ul className="list-disc list-inside space-y-1 text-gray-700 ml-4">
-              <li>Your code is in GitHub: <code className="bg-gray-100 px-2 py-1 rounded text-sm">https://github.com/&lt;your-org&gt;/&lt;project-name&gt;</code></li>
-              <li>Make changes and push to <code className="bg-gray-100 px-2 py-1 rounded text-sm">main</code> branch</li>
-              <li>ArgoCD auto-syncs changes within 3 minutes</li>
-              <li>Or manually sync via ArgoCD UI</li>
-            </ul>
-          </div>
-
-          <div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">Q: How do I delete a service?</h3>
-            <ul className="list-disc list-inside space-y-1 text-gray-700 ml-4">
-              <li>Dashboard → Click on project → Delete button</li>
-              <li>This removes: GitHub repo, ArgoCD application, Kubernetes deployment</li>
-            </ul>
-          </div>
-        </div>
-      </section>
-
-      {/* Next Steps */}
-      <section className="bg-govuk-blue rounded-none border border-govuk-dark-blue p-8 text-white">
-        <h2 className="text-3xl font-bold mb-6 text-center">Next Steps</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-          <div className="bg-white/10 rounded-none p-6">
-            <h3 className="text-xl font-semibold mb-3">✅ Create Your First Project</h3>
-            <p className="mb-4">Start building your microservice in minutes</p>
-            <Link
-              to="/create"
-              className="inline-block bg-govuk-success text-white px-6 py-3 rounded-none font-bold hover:bg-[#005a30] transition-colors"
-            >
-              Create Project →
-            </Link>
-          </div>
-
-          <div className="bg-white/10 rounded-none p-6">
-            <h3 className="text-xl font-semibold mb-3">✅ View Dashboard</h3>
-            <p className="mb-4">Monitor all your services in one place</p>
-            <Link
-              to="/dashboard"
-              className="inline-block bg-govuk-success text-white px-6 py-3 rounded-none font-bold hover:bg-[#005a30] transition-colors"
-            >
-              Go to Dashboard →
-            </Link>
+        <div className="glass-card p-8 overflow-hidden">
+          <div className="font-mono text-sm space-y-1.5 text-gray-400">
+            {[
+              { text: 'Your Request', color: 'text-white' },
+              { text: '  ↓', color: 'text-gray-600' },
+              { text: 'FastAPI Backend', color: 'text-accent-400' },
+              { text: '  ↓', color: 'text-gray-600' },
+              { text: 'Template Engine → Project files generated', color: 'text-purple-400' },
+              { text: '  ↓', color: 'text-gray-600' },
+              { text: 'GitHub → Repo created, code pushed', color: 'text-gray-300' },
+              { text: '  ↓', color: 'text-gray-600' },
+              { text: 'GitHub Actions → Docker image built & pushed', color: 'text-amber-400' },
+              { text: '  ↓', color: 'text-gray-600' },
+              { text: 'ArgoCD → Syncs Helm chart to Kubernetes', color: 'text-cyan-400' },
+              { text: '  ↓', color: 'text-gray-600' },
+              { text: 'k3s → Deployment + Service + Ingress', color: 'text-accent-400' },
+              { text: '  ↓', color: 'text-gray-600' },
+              { text: 'Your service is LIVE', color: 'text-emerald-400 font-semibold' },
+            ].map((line, i) => (
+              <div key={i} className={line.color}>{line.text}</div>
+            ))}
           </div>
         </div>
 
-        <div className="text-center">
-          <p className="text-lg opacity-90">
-            Built with ❤️ using React, FastAPI, Kubernetes, ArgoCD, and Claude AI
-          </p>
+        {/* Tech stack */}
+        <div className="mt-8 grid grid-cols-2 sm:grid-cols-4 gap-3">
+          {techStack.map((t) => (
+            <div key={t.name} className="glass-card px-4 py-3 text-center">
+              <p className="text-sm font-medium text-white">{t.name}</p>
+              <p className="text-[11px] text-gray-500 mt-0.5">{t.role}</p>
+            </div>
+          ))}
         </div>
-      </section>
+      </div>
+
+      {/* CTA */}
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pb-20">
+        <div className="relative overflow-hidden rounded-2xl border border-white/[0.08]" style={{ background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(34, 211, 238, 0.05))' }}>
+          <div className="absolute inset-0 bg-grid-pattern bg-grid opacity-20" />
+          <div className="relative p-10 text-center">
+            <h2 className="font-display text-2xl font-bold text-white mb-3">Ready to build?</h2>
+            <p className="text-gray-400 mb-8 max-w-md mx-auto">
+              Create your first microservice and have it running in production in under 5 minutes.
+            </p>
+            <div className="flex items-center justify-center gap-4">
+              <Link to="/create" className="btn-success text-sm no-underline px-6 py-3">
+                Create Project
+              </Link>
+              <Link to="/dashboard" className="btn-ghost text-sm no-underline px-6 py-3">
+                View Dashboard
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   )
 }

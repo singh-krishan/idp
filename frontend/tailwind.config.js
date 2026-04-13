@@ -7,71 +7,79 @@ export default {
   theme: {
     extend: {
       colors: {
-        // GOV.UK Color Palette
-        'govuk': {
-          'blue': '#1d70b8',           // Primary brand color
-          'dark-blue': '#003078',      // Dark variant
-          'light-blue': '#5694ca',     // Light variant
-          'focus': '#ffdd00',          // Focus indicator (yellow)
-          'text': '#0b0c0c',           // Main text color
-          'secondary-text': '#505a5f', // Secondary text
-          'border': '#b1b4b6',         // Borders
-          'input-border': '#0b0c0c',   // Input borders
-          'link': '#1d70b8',           // Links
-          'link-hover': '#003078',     // Link hover
-          'link-visited': '#4c2c92',   // Visited links
-          'error': '#d4351c',          // Error red
-          'success': '#00703c',        // Success green
-          'warning': '#f47738',        // Warning orange
-          'background': '#f3f2f1',     // Page background
-          'white': '#ffffff',
+        'surface': {
+          DEFAULT: '#0c1222',
+          '50': '#f0f4ff',
+          '100': '#e0e8ff',
+          '200': '#c7d4fe',
+          '300': '#a3b5fd',
+          '400': '#7c8cfa',
+          '500': '#5b63f5',
+          '600': '#4640ea',
+          '700': '#3a30cf',
+          '800': '#1a1f3d',
+          '900': '#111827',
+          '950': '#0c1222',
         },
-        // Status badge colors (softer for backgrounds)
-        'status': {
-          'pending': '#b1b4b6',        // Grey
-          'creating': '#ffdd00',       // Yellow
-          'building': '#5694ca',       // Light blue
-          'deploying': '#4c2c92',      // Purple
-          'active': '#00703c',         // Green
-          'failed': '#d4351c',         // Red
-        }
+        'accent': {
+          DEFAULT: '#3b82f6',
+          '50': '#eff6ff',
+          '100': '#dbeafe',
+          '200': '#bfdbfe',
+          '300': '#93c5fd',
+          '400': '#60a5fa',
+          '500': '#3b82f6',
+          '600': '#2563eb',
+          '700': '#1d4ed8',
+        },
+        'cyber': {
+          'cyan': '#22d3ee',
+          'green': '#34d399',
+          'amber': '#fbbf24',
+          'rose': '#fb7185',
+          'purple': '#a78bfa',
+        },
       },
       fontFamily: {
-        // GOV.UK Transport font with fallbacks
-        'sans': ['Inter', 'Arial', 'sans-serif'],
-      },
-      fontSize: {
-        // GOV.UK type scale (responsive handled in CSS)
-        'body-s': ['16px', '20px'],
-        'body': ['19px', '25px'],
-        'body-l': ['24px', '30px'],
-        'heading-s': ['19px', '25px'],
-        'heading-m': ['24px', '30px'],
-        'heading-l': ['36px', '40px'],
-        'heading-xl': ['48px', '50px'],
-      },
-      spacing: {
-        // GOV.UK spacing scale (mobile values)
-        '1': '5px',
-        '2': '10px',
-        '3': '15px',
-        '4': '20px',
-        '5': '25px',
-        '6': '30px',
-        '7': '40px',
-        '8': '50px',
-        '9': '60px',
-      },
-      maxWidth: {
-        'govuk': '1020px', // GOV.UK max page width
-      },
-      borderRadius: {
-        'none': '0',  // GOV.UK uses minimal border radius
+        'display': ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
+        'body': ['"DM Sans"', 'system-ui', 'sans-serif'],
+        'mono': ['"JetBrains Mono"', 'monospace'],
       },
       boxShadow: {
-        'none': 'none',
-        'sm': '0 2px 4px rgba(0,0,0,0.1)',
-      }
+        'glow': '0 0 20px rgba(59, 130, 246, 0.15)',
+        'glow-lg': '0 0 40px rgba(59, 130, 246, 0.2)',
+        'glow-cyan': '0 0 20px rgba(34, 211, 238, 0.15)',
+        'glow-green': '0 0 20px rgba(52, 211, 153, 0.15)',
+        'card': '0 4px 24px rgba(0, 0, 0, 0.3)',
+        'card-hover': '0 8px 40px rgba(0, 0, 0, 0.4)',
+      },
+      backgroundImage: {
+        'grid-pattern': 'linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px)',
+        'gradient-radial': 'radial-gradient(ellipse at center, var(--tw-gradient-stops))',
+        'hero-glow': 'radial-gradient(ellipse 80% 50% at 50% -20%, rgba(59, 130, 246, 0.15), transparent)',
+      },
+      backgroundSize: {
+        'grid': '40px 40px',
+      },
+      animation: {
+        'fade-in': 'fadeIn 0.5s ease-out forwards',
+        'slide-up': 'slideUp 0.5s ease-out forwards',
+        'slide-down': 'slideDown 0.3s ease-out forwards',
+      },
+      keyframes: {
+        fadeIn: {
+          '0%': { opacity: '0' },
+          '100%': { opacity: '1' },
+        },
+        slideUp: {
+          '0%': { opacity: '0', transform: 'translateY(16px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
+        },
+        slideDown: {
+          '0%': { opacity: '0', transform: 'translateY(-8px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
+        },
+      },
     },
   },
   plugins: [],

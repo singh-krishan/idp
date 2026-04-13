@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate, Link } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate, Link, useLocation } from 'react-router-dom'
 import { useState } from 'react'
 import Login from './components/Login'
 import PasswordReset from './components/PasswordReset'
@@ -15,10 +15,13 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-govuk-background flex items-center justify-center">
+      <div className="min-h-screen bg-surface-950 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-govuk-blue mx-auto"></div>
-          <p className="mt-4 text-govuk-secondary-text">Loading...</p>
+          <div className="relative w-12 h-12 mx-auto">
+            <div className="absolute inset-0 rounded-full border-2 border-accent-500/20"></div>
+            <div className="absolute inset-0 rounded-full border-2 border-transparent border-t-accent-500 animate-spin"></div>
+          </div>
+          <p className="mt-4 text-gray-500 text-sm">Loading...</p>
         </div>
       </div>
     )
@@ -27,123 +30,97 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   return user ? <>{children}</> : <Navigate to="/login" />
 }
 
+function NavLink({ to, children }: { to: string; children: React.ReactNode }) {
+  const location = useLocation()
+  const isActive = location.pathname === to
+
+  return (
+    <Link
+      to={to}
+      className={`relative px-3 py-2 text-sm font-medium transition-colors duration-200 ${
+        isActive
+          ? 'text-white'
+          : 'text-gray-400 hover:text-white'
+      }`}
+    >
+      {children}
+      {isActive && (
+        <span className="absolute bottom-0 left-3 right-3 h-0.5 bg-accent-500 rounded-full" />
+      )}
+    </Link>
+  )
+}
+
 function AppLayout({ children }: { children: React.ReactNode }) {
   const { user, logout } = useAuth()
 
   return (
-    <div className="min-h-screen bg-govuk-background">
-      {/* Skip Link for Accessibility */}
-      <a
-        href="#main-content"
-        className="sr-only focus:not-sr-only focus:absolute focus:top-0 focus:left-0 focus:z-50 focus:p-4 focus:bg-govuk-focus focus:text-govuk-text focus:no-underline"
-      >
-        Skip to main content
-      </a>
+    <div className="min-h-screen bg-surface-950">
+      <div className="noise-overlay" />
 
-      {/* Navigation Header */}
-      <nav className="bg-govuk-blue shadow-sm" role="navigation" aria-label="Main navigation">
+      {/* Navigation */}
+      <nav className="sticky top-0 z-40 border-b border-white/[0.06] bg-surface-950/80 backdrop-blur-xl">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-20">
-            <div className="flex items-center space-x-4">
-              {/* Logo */}
-              <Link to="/home" className="flex items-center space-x-4">
-                <div className="flex-shrink-0">
-                  <svg className="h-12 w-12" viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <rect width="50" height="50" rx="10" fill="white" fillOpacity="0.1"/>
-                    <path d="M25 10L15 20H20V35H30V20H35L25 10Z" fill="white"/>
-                    <circle cx="25" cy="40" r="2" fill="white"/>
-                    <path d="M12 15L18 15" stroke="white" strokeWidth="2" strokeLinecap="round"/>
-                    <path d="M32 15L38 15" stroke="white" strokeWidth="2" strokeLinecap="round"/>
-                  </svg>
-                </div>
+          <div className="flex items-center justify-between h-16">
+            {/* Logo */}
+            <Link to="/home" className="flex items-center space-x-3 no-underline">
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-accent-500 to-accent-700 flex items-center justify-center shadow-glow">
+                <svg className="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                  <path d="M12 2L2 12h4v8h12v-8h4L12 2z" />
+                </svg>
+              </div>
+              <span className="font-display font-bold text-white text-lg tracking-tight">
+                DevForge
+              </span>
+            </Link>
 
-                {/* Brand */}
-                <div>
-                  <h1 className="text-2xl font-bold text-white tracking-tight">
-                    DevForge
-                  </h1>
-                  <p className="text-white text-sm font-medium">
-                    Internal Developer Platform
-                  </p>
-                </div>
-              </Link>
+            {/* Nav links */}
+            <div className="hidden md:flex items-center space-x-1">
+              <NavLink to="/home">Home</NavLink>
+              <NavLink to="/create">Create</NavLink>
+              <NavLink to="/dashboard">Dashboard</NavLink>
+              {user?.role === 'admin' && (
+                <NavLink to="/analytics">Analytics</NavLink>
+              )}
             </div>
 
-            {/* Navigation Links */}
-            <div className="hidden md:flex items-center space-x-6">
-              <Link
-                to="/home"
-                className="text-white hover:text-govuk-focus transition-colors font-medium"
+            {/* User area */}
+            <div className="flex items-center space-x-4">
+              <span className="text-sm text-gray-500 hidden sm:block">
+                {user?.username}
+              </span>
+              <button
+                onClick={logout}
+                className="btn-ghost text-xs"
               >
-                Home
-              </Link>
-              <Link
-                to="/create"
-                className="text-white hover:text-govuk-focus transition-colors font-medium"
-              >
-                Create Project
-              </Link>
-              <Link
-                to="/dashboard"
-                className="text-white hover:text-govuk-focus transition-colors font-medium"
-              >
-                Dashboard
-              </Link>
-              {user?.role === 'admin' && (
-                <Link
-                  to="/analytics"
-                  className="text-white hover:text-govuk-focus transition-colors font-medium"
-                >
-                  Analytics
-                </Link>
-              )}
-              <div className="flex items-center space-x-4 text-white border-l border-white/20 pl-6">
-                <span className="text-sm text-white">Welcome, {user?.username}</span>
-                <button
-                  onClick={logout}
-                  className="px-4 py-2 bg-white/10 hover:bg-white/20 rounded-none transition-colors text-sm font-medium"
-                >
-                  Logout
-                </button>
-              </div>
+                Logout
+              </button>
             </div>
           </div>
         </div>
       </nav>
 
-      {/* Main Content */}
-      <main id="main-content">
+      {/* Main content */}
+      <main className="relative">
         {children}
       </main>
 
       {/* Footer */}
-      <footer className="bg-white border-t border-govuk-border mt-20">
+      <footer className="border-t border-white/[0.06] mt-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="flex flex-col md:flex-row justify-between items-center">
-            <div className="flex items-center space-x-3 mb-4 md:mb-0">
-              <svg className="h-8 w-8" viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <rect width="50" height="50" rx="10" fill="#1d70b8"/>
-                <path d="M25 10L15 20H20V35H30V20H35L25 10Z" fill="white"/>
-                <circle cx="25" cy="40" r="2" fill="white"/>
-              </svg>
-              <div>
-                <div className="text-sm font-semibold text-govuk-text">DevForge Platform</div>
-                <div className="text-xs text-govuk-secondary-text">v0.1.0</div>
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+            <div className="flex items-center space-x-3">
+              <div className="w-6 h-6 rounded-md bg-gradient-to-br from-accent-500 to-accent-700 flex items-center justify-center">
+                <svg className="w-3 h-3 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                  <path d="M12 2L2 12h4v8h12v-8h4L12 2z" />
+                </svg>
               </div>
+              <span className="text-sm text-gray-500">
+                DevForge <span className="text-gray-600">v0.2.0</span>
+              </span>
             </div>
-
-            <div className="flex items-center space-x-6 text-sm text-govuk-secondary-text">
-              <a href="#" className="hover:text-govuk-link-hover transition-colors">Documentation</a>
-              <a href="#" className="hover:text-govuk-link-hover transition-colors">API Reference</a>
-              <a href="https://github.com" target="_blank" rel="noopener noreferrer" className="hover:text-govuk-link-hover transition-colors">
-                GitHub
-              </a>
-            </div>
-          </div>
-
-          <div className="mt-6 pt-6 border-t border-govuk-border text-center">
-            <p className="text-sm text-govuk-secondary-text">
-              Powered by React, FastAPI, Kubernetes & ArgoCD • Built with ❤️ using Claude
+            <p className="text-xs text-gray-600">
+              React + FastAPI + Kubernetes + ArgoCD
             </p>
           </div>
         </div>
@@ -161,47 +138,45 @@ function CreateProjectPage() {
 
   return (
     <AppLayout>
-      {/* Hero Section */}
-      <div className="bg-white border-b border-govuk-border">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      {/* Hero */}
+      <div className="relative overflow-hidden border-b border-white/[0.06]">
+        <div className="absolute inset-0 bg-hero-glow" />
+        <div className="absolute inset-0 bg-grid-pattern bg-grid opacity-30" />
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <div className="text-center">
-            <h2 className="text-4xl font-extrabold text-govuk-text sm:text-5xl">
-              Build Services at
-              <span className="text-govuk-blue"> Lightning Speed</span>
-            </h2>
-            <p className="mt-4 text-xl text-govuk-secondary-text max-w-3xl mx-auto">
-              Create production-ready microservices with automated CI/CD, Kubernetes deployment, and monitoring in minutes
+            <h1 className="font-display text-4xl sm:text-5xl font-extrabold text-white tracking-tight">
+              Build Services at{' '}
+              <span className="bg-gradient-to-r from-accent-400 to-cyber-cyan bg-clip-text text-transparent">
+                Lightning Speed
+              </span>
+            </h1>
+            <p className="mt-4 text-lg text-gray-400 max-w-2xl mx-auto">
+              Production-ready microservices with CI/CD, Kubernetes, and monitoring — deployed in minutes.
             </p>
 
-            {/* Stats */}
-            <div className="mt-8 grid grid-cols-3 gap-8 max-w-2xl mx-auto">
-              <div className="bg-white border border-govuk-border rounded-none p-4">
-                <div className="text-3xl font-bold text-govuk-blue">2</div>
-                <div className="text-sm text-govuk-secondary-text font-medium">Templates</div>
-              </div>
-              <div className="bg-white border border-govuk-border rounded-none p-4">
-                <div className="text-3xl font-bold text-govuk-success">100%</div>
-                <div className="text-sm text-govuk-secondary-text font-medium">Automated</div>
-              </div>
-              <div className="bg-white border border-govuk-border rounded-none p-4">
-                <div className="text-3xl font-bold text-govuk-blue">&lt;5min</div>
-                <div className="text-sm text-govuk-secondary-text font-medium">Deploy Time</div>
-              </div>
+            <div className="mt-10 grid grid-cols-3 gap-4 max-w-md mx-auto">
+              {[
+                { value: '4', label: 'Templates' },
+                { value: '100%', label: 'Automated' },
+                { value: '<5m', label: 'Deploy' },
+              ].map((stat) => (
+                <div key={stat.label} className="glass-card px-4 py-3 text-center">
+                  <div className="text-xl font-display font-bold text-white">{stat.value}</div>
+                  <div className="text-xs text-gray-500 mt-0.5">{stat.label}</div>
+                </div>
+              ))}
             </div>
           </div>
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      {/* Content */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Left Column */}
-          <div className="space-y-6">
+          <div className="animate-slide-up">
             <ProjectForm onSuccess={handleProjectCreated} />
           </div>
-
-          {/* Right Column */}
-          <div className="space-y-6">
+          <div className="animate-slide-up animate-stagger-2">
             <ProjectList refreshTrigger={refreshTrigger} />
           </div>
         </div>
@@ -215,10 +190,13 @@ function App() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-govuk-background flex items-center justify-center">
+      <div className="min-h-screen bg-surface-950 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-govuk-blue mx-auto"></div>
-          <p className="mt-4 text-govuk-secondary-text">Loading...</p>
+          <div className="relative w-12 h-12 mx-auto">
+            <div className="absolute inset-0 rounded-full border-2 border-accent-500/20"></div>
+            <div className="absolute inset-0 rounded-full border-2 border-transparent border-t-accent-500 animate-spin"></div>
+          </div>
+          <p className="mt-4 text-gray-500 text-sm">Loading...</p>
         </div>
       </div>
     )
